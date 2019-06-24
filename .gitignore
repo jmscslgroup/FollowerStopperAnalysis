@@ -2,6 +2,5 @@
 *.idx
 *.out
 *.aux
-*.tex
 *.toc
 *.synctex.gz
