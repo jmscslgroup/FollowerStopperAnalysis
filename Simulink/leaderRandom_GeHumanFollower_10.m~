@@ -1,0 +1,107 @@
+% Chris Kreienkamp
+% 06/27/19
+% University of Arizona - CAT Vehicle
+
+
+%% leaderRandom_GeHumanFollower_10.m
+
+% This graphs 10 vehicles, with the lead vehicle starting at 10 m in front
+% of the follower vehicle. The lead vehicle travels at a random velocity
+% while the follower vehicles have their velocity controlled by the human
+% follower model presented by Ge.
+
+clear
+clc
+clf
+
+
+%% ORGANIZE DATA
+load leaderRandom_GeHumanFollower_10_xpos.mat
+t_xpos  = leaderRandom_GeHumanFollower_10_xpos.time;
+lead_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(1).values;
+follower1_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(2).values;
+follower2_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(3).values;
+follower3_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(4).values;
+follower4_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(5).values;
+follower5_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(6).values;
+follower6_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(7).values;
+follower7_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(8).values;
+follower8_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(9).values;
+follower9_xpos = leaderRandom_GeHumanFollower_10_xpos.signals(10).values;
+
+load leaderRandom_GeHumanFollower_10_ypos.mat
+t_ypos  = leaderRandom_GeHumanFollower_10_ypos.time;
+lead_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(1).values;
+follower1_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(2).values;
+follower2_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(3).values;
+follower3_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(4).values;
+follower4_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(5).values;
+follower5_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(6).values;
+follower6_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(7).values;
+follower7_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(8).values;
+follower8_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(9).values;
+follower9_ypos = leaderRandom_GeHumanFollower_10_ypos.signals(10).values;
+
+load leaderRandom_GeHumanFollower_10_vel.mat
+t_vel  = leaderRandom_GeHumanFollower_10_vel.time;
+lead_vel = leaderRandom_GeHumanFollower_10_vel.signals(1).values;
+follower1_vel = leaderRandom_GeHumanFollower_10_vel.signals(2).values;
+follower2_vel = leaderRandom_GeHumanFollower_10_vel.signals(3).values;
+follower3_vel = leaderRandom_GeHumanFollower_10_vel.signals(4).values;
+follower4_vel = leaderRandom_GeHumanFollower_10_vel.signals(5).values;
+follower5_vel = leaderRandom_GeHumanFollower_10_vel.signals(6).values;
+follower6_vel = leaderRandom_GeHumanFollower_10_vel.signals(7).values;
+follower7_vel = leaderRandom_GeHumanFollower_10_vel.signals(8).values;
+follower8_vel = leaderRandom_GeHumanFollower_10_vel.signals(9).values;
+follower9_vel = leaderRandom_GeHumanFollower_10_vel.signals(10).values;
+
+% load leaderRandom_GeHumanFollower_10_acc.mat
+% t_acc  = leaderRandom_GeHumanFollower_10_acc.time;
+% lead_acc = leaderRandom_GeHumanFollower_10_acc.signals(1).values;
+% follower_acc = leaderRandom_GeHumanFollower_10_acc.signals(2).values;
+
+
+%% PLOT DATA
+figure(1)
+plot(t_xpos,lead_xpos,'r-'); hold on
+plot(t_xpos,follower1_xpos,t_xpos,follower2_xpos,t_xpos,follower3_xpos,...
+    t_xpos,follower4_xpos,t_xpos,follower5_xpos,t_xpos,follower6_xpos,...
+    t_xpos,follower7_xpos,t_xpos,follower8_xpos,t_xpos,follower9_xpos); hold off
+set(gca,'FontSize',18)
+xlabel('Time (s)'); ylabel('Longitudinal Position (m)')
+legend('Lead','Follower','Location','Best')
+
+figure(2)
+plot(t_vel,lead_vel,'r-'); hold on
+plot(t_vel,follower1_vel,t_xpos,follower2_xpos,t_xpos,follower3_xpos,...
+    t_vel,follower4_vel,t_vel,follower5_vel,t_vel,follower6_vel,...
+    t_vel,follower7_vel,t_vel,follower8_vel,t_vel,follower9_xpos); hold off
+set(gca,'FontSize',18)
+xlabel('Time (s)'); ylabel('Longitudinal Velocity (m/s)')
+legend('Lead','Follower','Location','Best')
+
+% figure(3)
+% plot(t_acc,lead_acc,'r-'); hold on
+% plot(t_acc,follower_acc,'b-'); hold off
+% set(gca,'FontSize',18)
+% xlabel('Time (s)'); ylabel('Longitudinal Acceleration (m/s/s)')
+% legend('Lead','Follower','Location','Best')
+
+
+%% PLOT MOVING CARS
+figure(4)
+y1=min(follower_ypos)-1;
+y2=max(follower_ypos)+1;
+xlabel('x-position (m)'); ylabel('y-position (m)')
+set(gca,'Fontsize',18)
+lLine = animatedline('Color','r','Marker','s','MarkerSize',10,'MarkerFaceColor','r');
+fLine = animatedline('Color','b','Marker','s','MarkerSize',10,'MarkerFaceColor','b');
+for n = 1:1:length(follower_xpos)
+    axis([min(follower_xpos)-0.5 max(lead_xpos)+0.5 y1 y2])
+    clearpoints(fLine)
+    clearpoints(lLine)
+    addpoints(lLine,lead_xpos(n),lead_ypos(n))
+    addpoints(fLine,follower_xpos(n),follower_ypos(n))
+    drawnow
+    pause(0.25)
+end

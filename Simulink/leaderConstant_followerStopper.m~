@@ -2,13 +2,10 @@
 % 06/27/19
 % University of Arizona - CAT Vehicle
 
-
-%% leaderConstant_followerStopper.m
-
-% This graphs 2 vehicles, with the lead vehicle starting at 10 m in front
-% of the follower vehicle. The lead vehicle travels at a constant velocity 
-% of 1 m/s while the follower vehicle has its velocity controlled by 
-% followerStopper.
+% This graphs 2 vehicles, with the front vehicle starting at 10 m in front
+% of the follower vehicle. The front vehicle, leadVehicle, travels at a
+% constant velocity of 1 m/s while the follower vehicle, followerVehicle
+% has its velocity controlled by followerStopper.
 
 clear
 clc
@@ -56,7 +53,7 @@ figure(3)
 plot(t_acc,lead_acc,'r-'); hold on
 plot(t_acc,follower_acc,'b-'); hold off
 set(gca,'FontSize',18)
-xlabel('Time (s)'); ylabel('Longitudinal Acceleration (m/s/s)')
+xlabel('Time (s)'); ylabel('Longitudinal Acceleration (m/s)')
 legend('Lead','Follower','Location','Best')
 
 

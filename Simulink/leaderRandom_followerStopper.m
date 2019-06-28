@@ -3,11 +3,11 @@
 % University of Arizona - CAT Vehicle
 
 
-%% leaderConstant_followerStopper.m
+%% leaderRandom_followerStopper.m
 
 % This graphs 2 vehicles, with the lead vehicle starting at 10 m in front
-% of the follower vehicle. The lead vehicle travels at a constant velocity 
-% of 1 m/s while the follower vehicle has its velocity controlled by 
+% of the follower vehicle. The lead vehicle travels at a random velocity
+% while the follower vehicle has its velocity controlled by 
 % followerStopper.
 
 clear
@@ -16,25 +16,25 @@ clf
 
 
 %% ORGANIZE DATA
-load leaderConstant_followerStopper_xpos.mat
-t_xpos  = leaderConstant_followerStopper_xpos.time;
-lead_xpos = leaderConstant_followerStopper_xpos.signals(1).values;
-follower_xpos = leaderConstant_followerStopper_xpos.signals(2).values;
+load leaderRandom_followerStopper_xpos.mat
+t_xpos  = leaderRandom_followerStopper_xpos.time;
+lead_xpos = leaderRandom_followerStopper_xpos.signals(1).values;
+follower_xpos = leaderRandom_followerStopper_xpos.signals(2).values;
 
-load leaderConstant_followerStopper_ypos.mat
-t_ypos  = leaderConstant_followerStopper_ypos.time;
-lead_ypos = leaderConstant_followerStopper_ypos.signals(1).values;
-follower_ypos = leaderConstant_followerStopper_ypos.signals(2).values;
+load leaderRandom_followerStopper_ypos.mat
+t_ypos  = leaderRandom_followerStopper_ypos.time;
+lead_ypos = leaderRandom_followerStopper_ypos.signals(1).values;
+follower_ypos = leaderRandom_followerStopper_ypos.signals(2).values;
 
-load leaderConstant_followerStopper_vel.mat
-t_vel  = leaderConstant_followerStopper_vel.time;
-lead_vel = leaderConstant_followerStopper_vel.signals(1).values;
-follower_vel = leaderConstant_followerStopper_vel.signals(2).values;
+load leaderRandom_followerStopper_vel.mat
+t_vel  = leaderRandom_followerStopper_vel.time;
+lead_vel = leaderRandom_followerStopper_vel.signals(1).values;
+follower_vel = leaderRandom_followerStopper_vel.signals(2).values;
 
-load leaderConstant_followerStopper_acc.mat
-t_acc  = leaderConstant_followerStopper_acc.time;
-lead_acc = leaderConstant_followerStopper_acc.signals(1).values;
-follower_acc = leaderConstant_followerStopper_acc.signals(2).values;
+load leaderRandom_followerStopper_acc.mat
+t_acc  = leaderRandom_followerStopper_acc.time;
+lead_acc = leaderRandom_followerStopper_acc.signals(1).values;
+follower_acc = leaderRandom_followerStopper_acc.signals(2).values;
 
 
 %% PLOT DATA
@@ -77,9 +77,3 @@ for n = 1:1:length(follower_xpos)
     drawnow
     pause(0.25)
 end
-
-
-
-
-
-
