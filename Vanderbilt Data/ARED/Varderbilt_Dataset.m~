@@ -1,0 +1,70 @@
+clc
+clear 
+
+
+filename = 'expA.csv';
+Table_A = readtable(filename);
+A = table2array(Table_A(:,9:11));
+
+disp(Table_A(1,:))
+Number_of_Rows_In_Table_A = height(Table_A)
+
+
+% dist = A(:,1);
+% vel = A(:,2);
+% acc = A(:,3);
+
+%car 1 data ends at 12480
+
+car_1 = A(1,:);
+
+
+for index = 12480:24960
+    i = index-12479;
+    dist_car_2(i) = A(index,1);
+    vel_car_2(i) = A(index,2);
+    acc_car_2(i) = A(index,3);
+    
+end
+
+%disp(dist_car_2)
+%disp(vel_car_2)
+%disp(acc_car_2)
+
+
+
+%t = 0.03 * [0:12480]';
+%wave.time = t;
+%wave.signals.values = dist_car_2;
+%wave.signals.dimensions =1;
+
+
+ 
+% filename = 'expB.csv';
+% B = readtable(filename);
+% B
+% 
+% filename = 'expC.csv';
+% C = readtable(filename);
+% C
+% 
+% filename = 'expD.csv';
+% D = readtable(filename);
+% D(:,:)
+% 
+% filename = 'expE.csv';
+% E = readtable(filename);
+% E;
+% 
+% filename = 'expF.csv';
+% F = readtable(filename);
+% F;
+% 
+% filename = 'expG.csv';
+% G = readtable(filename);
+% G;
+% 
+% filename = 'expH.csv';
+% H = readtable(filename);
+% H;
+

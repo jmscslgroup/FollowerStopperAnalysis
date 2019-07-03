@@ -7,7 +7,7 @@
 
 % This graphs 2 vehicles, with the lead vehicle starting at 10 m in front
 % of the follower vehicle. The lead vehicle travels at a constant velocity 
-% of 1 m/s while the follower vehicle has its velocity controlled by 
+% while the follower vehicle has its velocity controlled by 
 % followerStopper.
 
 clear
@@ -62,20 +62,18 @@ legend('Lead','Follower','Location','Best')
 
 %% PLOT MOVING CARS
 figure(4)
-y1=min(follower_ypos)-1;
-y2=max(follower_ypos)+1;
 xlabel('x-position (m)'); ylabel('y-position (m)')
 set(gca,'Fontsize',18)
 lLine = animatedline('Color','r','Marker','s','MarkerSize',10,'MarkerFaceColor','r');
 fLine = animatedline('Color','b','Marker','s','MarkerSize',10,'MarkerFaceColor','b');
 for n = 1:1:length(follower_xpos)
-    axis([min(follower_xpos)-0.5 max(lead_xpos)+0.5 y1 y2])
+    axnum = max(follower_xpos)*n/length(follower_xpos);
+    axis([axnum-50 axnum+15 -1 1])
     clearpoints(fLine)
     clearpoints(lLine)
     addpoints(lLine,lead_xpos(n),lead_ypos(n))
     addpoints(fLine,follower_xpos(n),follower_ypos(n))
     drawnow
-    pause(0.25)
 end
 
 
