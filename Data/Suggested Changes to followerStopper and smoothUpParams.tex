@@ -193,14 +193,17 @@ The original code is easy to follow until line 27. In that line, the original co
 \end{figure}
 
 \subsection{Edited code part 2}
-Figure 6 displays the edited (part 2) code.
+Figure 6 displays the edited (part 2) and (part 3) code. They do the same thing, except (part 3) uses a piecewise setup for $\tt{u\_cmd}$ rather than the $\tt{if}$ statement.
 \subsubsection{$\mathtt{smoothChange}$}
 After spending some time looking at the oscillations, it was revealed that the sharp jumps occur when the relative distance $\mathtt{dx}$ crosses into a different piecewise area of the FollowerStopper in equation 4. If it was traveling at the reference velocity, the followerStopper edited code (part 1) made sure that it did not immediately travel at the reference velocity, but would incrementally work up to it. At points the AV would cross the $\mathtt{dx3}$ barrier, shooting up because that piecewise section calculated the command velocity $\mathtt{u}$ to be a large fraction of the much higher reference velocity. To solve this problem, a $\mathtt{smoothChange}$ variable, designed on line 30 in Figure 6, assured that no matter in what piecewise area that FollowerStopper was operating, it would not accelerate faster than the maximum acceleration. Though this could be tuned to deceleration as well, it is not desirable because FollowerStopper should not be limited in how quickly it can decelerate in case it needs to brake at full force to prevent a crash. Acceleration, however, is entirely dependent on rider comfort.
 
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=4in]{EDITED2_followerStopper}
-\caption{Edited (part 2) followerStopper code.}
+$\begin{array}{c}
+\includegraphics[width=3in]{EDITED2_followerStopper}
+\includegraphics[width=3in]{EDITED3_followerStopper}
+\end{array}$
+\caption{Edited (part 2) followerStopper code and edited (part 3) of followerStopper code.}
 \label{default}
 \end{center}
 \end{figure}

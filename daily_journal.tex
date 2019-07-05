@@ -52,6 +52,8 @@
 \usepackage[makeroom]{cancel}
 \usepackage{fancyhdr}
 \usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
 \setlength{\headheight}{15.2pt}
 %\pagestyle{fancy}
 %\rhead{65168}
@@ -72,6 +74,7 @@
     {0.01em}%
     {\normalfont\normalsize\bfseries}}
 \makeatother
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -95,7 +98,8 @@ ckreienk@email.arizona.edu
 Met with Rahul today to discuss possible directions where we could take the project, but my partner Fish was not present. Rahul summarized our meeting and sent a dense email filled with resources. I read through and took notes on ?Dissipation of stop-and-go waves via control of autonomous vehicles: Field experiments? and on ?The CAT Vehicle Testbed: A Simulator with hardware in the Loop for Autonomous Vehilce Applications.? Tomorrow I hope to read the rest of the papers (4) in the emial that concern the FollowerStopper. On Wednesday and Thursday I hope to familiarize myself with ROS, Gazebo, and the Testbed. Over the weekend I hope to focus on learning Simulink and supplementing my knowledge of control systems. \\
 
 {\bf Tuesday, June 11}\\
-I read through and took notes on ?Dissipation of emergent traffic waves in stop-and-go traffic us- ing a supervisory controller,? ?Tracking vehicle trajectories and fuel rates in phantom traffic jams: Methodology and data,? and ?Real-time distance estimation and filtering of vehicle headways for smoothing of traffic waves.? The first and third gave in-depth descriptions of the Follower Stop- per controller. After reading, it is clear that the parameter in the FollowerStopper configurable quadratic bands can be optimized through more research. The second paper discussed the circu- lar phantom jam experiment, giving a speical look on the tracking methods employed to find the instantaneous positions, velocities, accelerations, and fuel rates of all vehicles in the experiment. The third paper focused on the designing of filters to reduce the noice in relative velocity data of the lead vehicles and to calculate the expected separation distance between the AV and the lead vehicle. I cam up with a few questions because of the reading: Would it be beneficial to research how animals respond to ?traffic? in a herd? What if we looked at how acceleration/deceleration cause car-soickeness or imbalance in the ear when determining the maximum deceleration para- mater in the FollowerStopper? Would it be possible to develop a closed-form mathematical model establishing a relationship between safety metrics, sensor frequency, and desired accracy of the sensors in order to optimize use of more inexpensive sensors? \\
+I read through and took notes on "Dissipation of emergent traffic waves in stop-and-go traffic using a supervisory controller," "Tracking vehicle trajectories and fuel rates in phantom traffic jams: Methodology and data," and 
+"Real-time distance estimation and filtering of vehicle headways for smoothing of traffic waves." The first and third gave in-depth descriptions of the Follower Stop- per controller. After reading, it is clear that the parameter in the FollowerStopper configurable quadratic bands can be optimized through more research. The second paper discussed the circu- lar phantom jam experiment, giving a speical look on the tracking methods employed to find the instantaneous positions, velocities, accelerations, and fuel rates of all vehicles in the experiment. The third paper focused on the designing of filters to reduce the noice in relative velocity data of the lead vehicles and to calculate the expected separation distance between the AV and the lead vehicle. I cam up with a few questions because of the reading: Would it be beneficial to research how animals respond to traffic in a herd? What if we looked at how acceleration/deceleration cause car-sickeness or imbalance in the ear when determining the maximum deceleration paramater in the FollowerStopper? Would it be possible to develop a closed-form mathematical model establishing a relationship between safety metrics, sensor frequency, and desired accracy of the sensors in order to optimize use of more inexpensive sensors? \\
  
 {\bf Wednesday, June 12}\\
 I spent most of the day trying to unsuccessfully download MATLAB on my laptop. Otherwise, i have been working through ROS tutorials. I made it thorugh about half of the tutorials on http://wiki.ros.org/ROS/Tutorials, and I hope to make it through the rest by tomorrow.\\
@@ -141,5 +145,102 @@ Created two more Simulink models to give the car in Gazebo a sine wave velocity 
 {\bf Sunday, June 23}\\
 Met with my group partner, Fish, to create a presentation for the weekly update tomorrow. Afterwards I made sure that my daily journal was up to date. My weekly plan follows. Monday, Fish and I will give our presentation and then I hope to develop the FollowerStopper and one car-following controller to recreate Rahul's video. Tuesday, I hope to simulate the ring-road experiment and an experiment of cars in a straight line. Additionally I hope to create another car-following controller. Wednesday, i hope to create a third car-following controller and begin a report detailing if FollowerStopper is string stable or unstable. Thursday, Friday, and Saturday, if all is going according to play, I hope to continue the report and begin to try to optimize the parameters in the FollowerStopper controller.
 
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent \section*{Week 4}
+
+{\bf Wednesday, June 26} \\
+Created a Simulink model consisting of a lead and follower vehicle car plants, smoothUpParams, and FollowerStopper. smoothUpParams adjusts the reference velocity so that it does not cause the vehicle to accelerate too quickly, decelerate too quickly, or exceed the reference velocity. The model creates position and velocity data to be used by a MATLAB script I created to plot the position-time, velocity-time, and x-y graphs of the lead and follower vehicles. \\
+
+{\bf Sunday, June 30} \\
+Goals for the week:
+\begin{enumerate}
+\item Scenario One: line of vehicles
+	\begin{enumerate}
+	\item Lead car has a synthetic velocity from one of the cars in the ring-road experiment
+	\item Some follower vehicles immediately after with car-following model
+	\item One vehicle {\it i} with FollowerStopper
+	\item Some more follower vehicles with car-following model
+	\end {enumerate}
+\item Scenario Two: ring-road experiment
+	\begin{enumerate}
+	\item Model cars in perpetual traffic
+	\item One vehicle is FollowerStopper, all others are controlled by the car-following model
+	\end{enumerate}
+\item Scenario Three: repeat scenarios one and two, all with car-following model
+	\begin{enumerate}
+	\item incorporate a second car-following model
+	\item repeat scenarios one and two with the new car-following model in place of the old
+	\item repeat scenarios one and two with a mixture of the old and new car-following models
+	\end{enumerate}
+\item Scenario Four: repeat scenarios one and two, all with FollowerStopper
+\item Scenario Five: tune the desired velocity
+	\begin{enumerate}
+	\item Hand-tailored $\Rightarrow$ expert's advice
+	\item From global information
+	\end{enumerate}
+\end{enumerate}
+
+\pagebreak
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\noindent \section*{Week 5}
+
+{\bf Monday, July 1}
+\begin{itemize}
+\item Incorporated a Filtered Derivative block into the carPlant\_smootherUp\_followerStopper.slx Simulink file to obtain accurate information about the acceleration of the lead and follower vehicles. Changed the Simulink file so that the FollowerStopper controller would publish to a node rather than send the commanded velocity straight to the input of the follower vehicle to fix an algebraic loop issue caused by smoothUpParams.
+\item Downloaded \href{https://ir.vanderbilt.edu/handle/1803/9358}{\color{blue} The Arizona Ring Experiments Dataset (ARED)} from Vanderbilt. Chose Experiment E, car 1, as the vehicle off of which to obtain a synthetic lead vehicle velocity because Experiment E features the most oscillatory traffic without intervention by the CAT Vehicle to modify the flow of cars. Information about the other experiments in the dataset can be found in the paper, \href{https://www.sciencedirect.com/science/article/pii/S0968090X18318345}{\color{blue} Tracking vehicle trajectories and fuel rates in phantom traffic jams: Methodology and data}.
+\item Used the data to create a MATLAB script, $\mathtt{Vanderbilt\_Dataset.m}$, which extracts the velocity information for car 1 in Experiment E. The carPlant\_smootherUp\_followerStopper.slx Simulink file was updated so that this velocity would be the input to the lead vehicle and the reference velocity would be the average velocity for car 1 in Experiment E.
+\item PROBLEM: With the Vanderbilt data, the carPlant\_smoothUp\_followerStopper.slx Simulink file looks terrible at the beginning. The reference velocity and the command velocity are unstable, causing an incredibel acceleration. I attempted to edit the smoothUpParams to limit the maximum acceleration of the reference velocity, and it looked slightly better. The problem I believe is that smoothUpParams, if the reference velocity $\mathtt{max\_speed}$ is greater than 2 m/s will set the reference velocity $r$ to 2 m/s. FollowerStopper then immediately commands this velocity, which requires an incredible acceleration from 0 to 2 m/s over a short period of time. (solved 7/2)
+\end{itemize}
+
+{\bf Tuesday, July 2} \\
+\begin{itemize}
+\item PROBLEM: Fixed the problem from yesterday concerning smoothUpParams prescribing a high reference velocity $r$. When FollowerStopper is initiated, the AV under control must be going faster than 2 m/s or must be within $\omega_1$ of the leader vehicle. Yesterday, the lead vehicle was 10 m in front, which was too far ahead. Though this seemingly solves the problem, there is additional noise in the middle part of the FollowerStopper command velocity data when following the synthetic velocity lead vehicle. Also, we will not be able to have all cars start within $\omega_1$ during the recreation of the ring-road experiment, so further development is needed to solve the noise issue without editing the relative position. (solved 7/2)
+\item Edited the MATLAB functions for followerStopper and smoothUpParams and justified all changes in the document "Suggested Changes to followerStopper and smoothUpParams" on GitLab. The changes solve the above problem and the problem from yesterday. There are still some abrupt changes due to the fact that followerStopper must be able to decelerate to any velocity at any moment for safety's sake, but the acceleration does not exceed the desired maximum acceleration at any point. The AV can now initiate FS at any initial speed and any initial relative distance. An e-mail was sent to Rahul so that he would accept the changes, because either he or another designer of FS wrote the code.
+\item QUESTION: How does relative position relate to likeliness of a driver to lane change? We want FS to follow close enough to reduce the chances of lane changes, which will cause cars from behind moving around and more lane changes that will cause traffic. This problem is related to choosing the reference velocity.
+\item QUESTION: What is the actual comfortable acceleration and deceleration? Up until now, we have been using $1.5 {m\over s^2}$ but a more verified value should be used.
+\end{itemize}
+
+{\bf Wednesday, July 3} \\
+\begin{itemize}
+\item DOCUMENT: \href{https://www.tandfonline.com/doi/abs/10.1207/s15326969eco0303_2#.VcToHJNViko}{\color{blue} An ecological Theory of Motion Sickness and Postural Instability}: Proposes that animals become sick in situations in which they do not possess (or have not yet learned) strategies that are effective for the maintenance of postural stability. This enables the establishment of a link between motion sickness and postural stability. In flight simulators, the operator learns that the optical accelerations do not have consequences for body balance. When the operator leaves the simulator to drive home, the accelerations in the car could give rise to postural instabilities if the operator continues to decouple postural control strategies from the vehicle control strategies. The paper, unfortunately, gives no acceleration values which we are looking for to set as the maximum acceleration. It merely supports the previously suspected hypothesis that expected movements by the AV are less likely to cause motion sickness.
+\item CREATE STRING INSTABILITY TEST AND TEST FS AND CF1
+\item CREATE DELAY FOR FS
+\item CREATE SECOND CAR-FOLLOWING MODEL
+\item CREATING THE LINE OF VEHICLES
+\item EDIT CAR PLANT SO IT HAS THE Y THING FIXED
+\item ORGANIZE GITLAB
+\end{itemize}
+
+{\bf Friday, July 5} \\
+\begin{itemize}
+\item Creating graphs using the stringStabilityTest.slx file, which attempts to test if any of the car-following models or if FollowerStopper is string unstable. There are two tests, accleration steps and deceleration steps. Acceleration steps: the input velocity to the lead vehicle starts at 0 mph, accelerates to 5 mph, stays at 5 mph for 30 seconds, accelerates to increase the speed by 5 mph, stays for 30 seconds, and continues the trend until the speed reaches 35 mph, at which point the lead vehicle decelerates to 0 mph. Deceleration steps: The input velocity to the lead vehicle starts at 0 mph, accelerates to 35 mph, stays at 35 mph for 30 seconds, decelerates to decrease the speed by 5 mph, stays for 30 seconds, and continues the trend until the speed reaches 0 mph. Comment out everything except the acceleration and deceleration steps boxes and run those first. Then comment out those and uncomment everything else. This will save time on the simulation.
+	\begin{itemize}
+	\item stringStabilityTest\_1: Acceleration steps test for the edited FS controller and CF1. \linebreak
+	FS is unstable. CF1 is unstable.
+	\item stringStabilityTest\_2: Deceleration steps test for the edited FS controller and CF1. \linebreak
+	FS is unstable. CF1 is unstable.
+	\item stringStabilityTest\_3: Acceleration steps test for the original FS controller and CF1. \linebreak
+	FS is unstable. CF1 is unstable.
+	\end{itemize}
+\item The above experiments suggests that the edits to the original FS did not make FS unstable, but the original code was also string unstable along with other issues. Perhaps FS needs a better reference velocity, which was originally set to 27 m/s $\approx$ 60 mph.
+\item HAVE NOT YET IMPLEMENTED THIS: Equation 11 in  \href{https://www.researchgate.net/publication/332216360_Real-time_distance_estimation_and_filtering_of_vehicle_headways_for_smoothing_of_traffic_waves}{\color{blue} Real-Time Distance Estimation and Filtering of Vehicle Headways for Smoothing of Traffic in Waves} gives the total delay to be
+\begin{eqnarray}
+\delta={\delta_f F_s\over F_v}+\delta_r.
+\end{eqnarray}
+P. 8 of the same paper reveals the sampling frequencies of the sensors ($F_s$) and the lead vehicle velocity ($F_v$) to be the same, giving the total delay $\delta$ as the sum of the filter delay ($\delta_f$) and the fixed delay due to friction, actuator dynamics, controller update rate, etc. ($\delta_r$). A camera introduces a delay of $\delta_f=0.333$ s whereas LiDAR introduces a delay of $\delta_f=0.133$ s. For a conservative estimate, the delay of the camera is used in conjunction with the fixed delay $\delta_r=1.0$ s to give a total delay of $\delta=1.333$ s. Because the time step in Simulink is 0.01, I added a delay to the FollowerStopper controller to react 133 steps after receiving information.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}
