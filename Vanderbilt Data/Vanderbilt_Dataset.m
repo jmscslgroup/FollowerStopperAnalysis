@@ -45,6 +45,22 @@ vel_car_1 = [time(1:rowsPerCar_E) vel(1:rowsPerCar_E)];
 acc_car_1 = [time(1:rowsPerCar_E) acc(1:rowsPerCar_E)];
 ave_vel_car_1 = mean(vel_car_1(:,2),'all')
 
+%% ORGANIZE DATA FOR CAR 6 IN FRONT OF LEAD
+carNumber = 14;
+for index = 1:rowsPerCar_E
+    i = index + rowsPerCar_E*(carNumber-1);
+    dist_car_14(index,1) = dist(i);
+    vel_car_14(index,1) = vel(i);
+    acc_car_14(index,1) = acc(i);
+end
+dist_car_14 = [time(1:rowsPerCar_E) dist_car_14(1:rowsPerCar_E)];
+vel_car_14 = [time(1:rowsPerCar_E) vel_car_14(1:rowsPerCar_E)];
+vel_car_14 = max(0,vel_car_14);
+acc_car_14 = [time(1:rowsPerCar_E) acc_car_14(1:rowsPerCar_E)];
+for i = 1:300:9900
+    ave_vel_car_14(i:i+299,1) = vel_car_14(i:i+299,1);
+    ave_vel_car_14(i:i+299,2) = ones(300,1)*mean(vel_car_14(i:i+299,2));
+end
 
 %% ORGANIZE DATA FOR ANOTHER CAR
 % carNumber = ??;
