@@ -1,5 +1,6 @@
 % Chris Kreienkamp
-% 7/29/19
+% University of Arizona, CAT Vehicle
+% July 29, 2019
 % Calculation of the max safe speed of the AV
 
 clear
