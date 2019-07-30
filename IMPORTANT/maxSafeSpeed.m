@@ -11,7 +11,7 @@ clc
 G = 9.80665;
 psi = 1;
 ksi = 81;
-delta = 1.183;
+delta = 1.158;
 a_dmax = -7.66;
 a_cmft = 0.15*G;
 k = -G/a_dmax;
