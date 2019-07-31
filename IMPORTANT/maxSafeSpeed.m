@@ -12,18 +12,18 @@ G = 9.80665;
 psi = 1;
 ksi = 81;
 delta = 1.158;
+a_max = 3.53;
 a_dmax = -7.66;
-a_cmft = 0.15*G;
 k = -G/a_dmax;
 v_lead = 0;
-v_AV = linspace(20,35,10000);
+v_AV = linspace(0,35,10000);
 
 
 %% CALCULATION
 deltaVSStar = max(0, 1/2/k/a_dmax.*(v_lead^2-k.*v_AV.^2));
-% y = -ksi + psi + deltaVSStar + v_AV.*(1-a_cmft/a_dmax)*delta...
-%     + a_cmft/2*(1-a_cmft/a_dmax)*delta^2;
-y = -ksi + psi + deltaVSStar + v_AV.*delta;
+y = -ksi + psi + deltaVSStar + v_AV.*(1-a_max/a_dmax)*delta...
+    + a_max/2*(1-a_max/a_dmax)*delta^2;
+% y = -ksi + psi + deltaVSStar + v_AV.*delta;
 
 %% PLOT
 plot(v_AV,y)
