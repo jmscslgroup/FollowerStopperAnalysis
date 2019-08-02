@@ -19,7 +19,7 @@
 }
 
 \author{\IEEEauthorblockN{Chris Kreienkamp}
-\IEEEauthorblockA{\textit{Aerospace and Mechanical Engineering} \\
+\IEEEauthorblockA{\textit{Department of Aerospace and Mechanical Engineering} \\
 \textit{University of Notre Dame}\\
 Notre Dame, IN, United States \\
 ckreienk@nd.edu}
@@ -31,16 +31,16 @@ Springfield, MO, United States \\
 fishbein486@live.missouristate.edu}
 \and
 \IEEEauthorblockN{Rahul Bhadani}
-\IEEEauthorblockA{\textit{Electrical and Computer Engineering} \\
+\IEEEauthorblockA{\textit{Department of Electrical and Computer Engineering} \\
 \textit{University of Arizona}\\
 Tucson, AZ, United States \\
 rahulbhadani@email.arizona.edu}
 \and
-\IEEEauthorblockN{Dr. Jonathon Sprinkle}
-\IEEEauthorblockA{\textit{Electrical and Computer Engineering} \\
+\IEEEauthorblockN{Jonathan Sprinkle}
+\IEEEauthorblockA{\textit{Department of Electrical and Computer Engineering} \\
 \textit{University of Arizona}\\
 Tucson, AZ, United States \\
-sprinklejm@email.arizona.edu}
+sprinkjm@email.arizona.edu}
 }
 
 \maketitle
@@ -266,7 +266,7 @@ FollowerStopper is designed such that the AV will not accelerate faster than $a_
 To compare the old and new versions of FollowerStopper, a Simulink model was developed incorporating the Vehicle Body 3DOF model. The model incorporates expected sensor and actuation delays and can display output such as the lead and AV velocities, positions, and accelerations. It is not completely accurate, as when sending a delayed $v_{AV}$ to the Vehicle Body 3DOF block, the simulation produces inaccurate data. Therefore, the $v_{AV}$ data could not be delayed. The final representation of the model is displayed below for a lead vehicle and AV. The model is computed using a fixed time-step of 0.01 s, meaning that it is updated every 0.01 s.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=3.5 in]{simulink_model.png}}
+\centerline{\includegraphics[width=3.5 in]{simulink_model.PNG}}
 \caption{Simulink model.}
 \label{fig2}
 \end{figure}
@@ -275,7 +275,7 @@ To compare the old and new versions of FollowerStopper, a Simulink model was dev
 The Vehicle Body 3DOF Dual Track block in Simulink models the lead vehicle and the AV. This particular block is ideal for creating virtual sensor data, which can then be used by FollowerStopper. Further information about the model can be found in \cite{vehicledynamicsblockset}. By inputing a velocity "xdot", steering angle, and initial longitudinal position "X\_o" to the lead vehicle, the block artificially creates vehicle data including the instantaneous position and instantaneous velocity of the lead. Another Vehicle Body 3DOF Dual Track block models the AV, using the same steering angle, but starting behind the lead at a lesser longitudinal position "X\_o". The input velocity for the AV comes from the command velocity $v_{cmd}$ output of FollowerStopper.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=3.5 in]{vehicle_body_3dof.png}}
+\centerline{\includegraphics[width=3.5 in]{vehicle_body_3dof.PNG}}
 \caption{Lead vehicle and AV model in Simulink using the Vehicle Body 3DOF Dual Track block.}
 \label{fig2}
 \end{figure}
@@ -299,7 +299,7 @@ It is obvious that it would be inaccurate to use the current values of the relat
 Given this knowledge, the Simulink model could be considered reasonably accurate if the relative distance, relative velocity, and AV velocity were all delayed by 1.508 s. Unfortunately, when the AV velocity is delayed, the simulation updates $v_{cmd}$ once every 1.508 s, slowing the simulation from its normal update rate of 0.01 s. The problem is related to the Vehicle Body block rather than FollowerStopper, and a solution could not be found that would not compromise more important parts of the model. The model therefore uses the delayed relative distance and relative velocity values, but it uses the current AV velocity, deeming the model inaccurate but still an acceptable platform from which to test FollowerStopper before implementation into Gazebo or the actual CAT Vehicle.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=3.5 in]{delay.png}}
+\centerline{\includegraphics[width=3.5 in]{delay.PNG}}
 \caption{Delay in Simulink.}
 \label{fig2}
 \end{figure}
@@ -308,7 +308,7 @@ Given this knowledge, the Simulink model could be considered reasonably accurate
 The SmoothUpParams block, as described above, edits the reference velocity before sending it to FollowerStopper. If the reference velocity changes, most likely due to a road-side controller sending information to the AV, SmoothUpParams will slowly and continually update the reference velocity sent to FollowerStopper. SmoothUpParams will ensure that, if FollowerStopper is commanding exactly the reference velocity, the changing reference velocity will not cause the AV to exceed a maximum comfortable acceleration or deceleration. Once SmoothUpParams reaches the actual reference velocity, it will simply continue to send the current reference velocity until it receives a new one. Our tests never include a changing reference velocity, so SmoothUpParams could technically be removed from the model and nothing would change. However, if further work were to be done in optimizing the reference velocity, SmoothUpParams would be essential.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=3.5 in]{smoothupparams.png}}
+\centerline{\includegraphics[width=3.5 in]{smoothupparams.PNG}}
 \caption{SmoothUpParams in Simulink.}
 \label{fig2}
 \end{figure}
@@ -317,7 +317,7 @@ The SmoothUpParams block, as described above, edits the reference velocity befor
 The FollowerStopper block takes $\Delta x$, $\Delta v$, $r$, $a_{max}$, $a_{dmax}$, $k$, the moving average, and $\delta$ as inputs and uses a MATLAB Function to calculate $\xi_1$, $\xi_2$, $\xi_3$, and $v_{cmd}$ as described in section 4 above. The FollowerStopper block outputs the new $v_{cmd}$, and then that value is used as the input velocity to the AV for the next time step.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=3.5 in]{followerstopper.png}}
+\centerline{\includegraphics[width=3.5 in]{followerstopper.PNG}}
 \caption{FollowerStopper in Simulink.}
 \label{fig2}
 \end{figure}
@@ -326,13 +326,13 @@ The FollowerStopper block takes $\Delta x$, $\Delta v$, $r$, $a_{max}$, $a_{dmax
 The descriptions thus far have focused on the development of a two-car model, with one lead vehicle and one AV. This is sufficient for building the model, implementing in Gazebo, and testing with the CAT Vehicle. Additionally it is sufficient for determining if FollowerStopper is safe because any velocity can be input to the lead, and the AV will follow. When determining string stability, however, a multi-car model is required in order to see how each successive car reacts to a change in velocity by the lead vehicle. To test for string stability, the AV Vehicle Body 3DOF block, delay blocks, SmoothUpParams, and FollowerStopper were combined into one block to represent one AV, as pictured in Figure \ref{multicarmodel1}. The one combined block could take the lead position, moving average, reference velocity, and lead velocity as inputs and would output the AV position, spacing error, and velocity. By connecting several blocks in a line and editing the initial longitudinal position of each vehicle, a multi-car model could be developed and analyzed, as seen in Figure \ref{multicarmodel2}.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=2 in]{7carmodelblock.png}}
+\centerline{\includegraphics[width=2 in]{7carmodelblock.PNG}}
 \caption{Combined AV and FollowerStopper block in Simulink.}
 \label{multicarmodel1}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=3.5 in]{7carmodel.png}}
+\centerline{\includegraphics[width=3.5 in]{7carmodel.PNG}}
 \caption{Multi-car model in Simulink.}
 \label{multicarmodel2}
 \end{figure}
@@ -453,7 +453,7 @@ Use of LiDAR as the main sensor input is limiting due to the short range of LiDA
 To determine the maximum deceleration of the lead vehicle, consider Figure \ref{fig3}.
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=2.00 in]{maxDecel.png}}
+\centerline{\includegraphics[width=2.00 in]{maxDecel.PNG}}
 \caption{Free-body diagram of a four-wheeled vehicle during deceleration.}
 \label{fig3}
 \end{figure}
@@ -480,7 +480,7 @@ a &=& -G\mu
 \subsection{Derivation of $\xi_1$}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6 in]{xiDerivation.png}}
+\centerline{\includegraphics[width=6 in]{xiDerivation.PNG}}
 \caption{Emergency breaking progression.}
 \label{fig2}
 \end{figure}
@@ -539,37 +539,37 @@ Finally, it must be noted that it is never desirable for $\xi_1$ to drop below $
 \pagebreak
 \subsection{Moving average plots}
 \begin{figure}[htbp!]
-\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma1.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma1.PNG}}
 \caption{Step Test with no moving average.}
 \label{ma1}
 \end{figure}
 
 \begin{figure}[htbp!]
-\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma5.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma5.PNG}}
 \caption{Step Test with a moving average of 5.}
 \label{ma5}
 \end{figure}
 
 \begin{figure}[htbp!]
-\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma25.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma25.PNG}}
 \caption{Step Test with a moving average of 25.}
 \label{ma25}
 \end{figure}
 
 \begin{figure}[htbp!]
-\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma50.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma50.PNG}}
 \caption{Step Test with a moving average of 50.}
 \label{ma50}
 \end{figure}
 
 \begin{figure}[htbp!]
-\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma75.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma75.PNG}}
 \caption{Step Test with a moving average of 75.}
 \label{ma75}
 \end{figure}
 
 \begin{figure}[htbp!]
-\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma100.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma100.PNG}}
 \caption{Step Test with a moving average of 100.}
 \label{ma100}
 \end{figure}
@@ -603,37 +603,37 @@ Finally, it must be noted that it is never desirable for $\xi_1$ to drop below $
 \subsection{FollowerStopper safety plots}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=5.71 in]{oldFS_safety1.png}}
+\centerline{\includegraphics[width=5.71 in]{oldFS_safety1.PNG}}
 \caption{Original FollowerStopper in Safety Test 1.}
 \label{oldsafe1}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=5.71 in]{oldFS_safety2.png}}
+\centerline{\includegraphics[width=5.71 in]{oldFS_safety2.PNG}}
 \caption{Original FollowerStopper in Safety Test 2.}
 \label{oldsafe2}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=5.71 in]{oldFS_safety3.png}}
+\centerline{\includegraphics[width=5.71 in]{oldFS_safety3.PNG}}
 \caption{Original FollowerStopper in Safety Test 3.}
 \label{oldsafe3}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=5.71 in]{newFS_safety1.png}}
+\centerline{\includegraphics[width=5.71 in]{newFS_safety1.PNG}}
 \caption{New FollowerStopper in Safety Test 1.}
 \label{newsafe1}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=5.71 in]{newFS_safety2.png}}
+\centerline{\includegraphics[width=5.71 in]{newFS_safety2.PNG}}
 \caption{New FollowerStopper in Safety Test 2.}
 \label{newsafe2}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=5.71 in]{newFS_safety3.png}}
+\centerline{\includegraphics[width=5.71 in]{newFS_safety3.PNG}}
 \caption{New FollowerStopper in Safety Test 3.}
 \label{newsafe3}
 \end{figure}
@@ -643,31 +643,31 @@ Finally, it must be noted that it is never desirable for $\xi_1$ to drop below $
 \subsection{FollowerStopper string stability plots}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{multiFS_velbad.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad.PNG}}
 \caption{Velocity vs time of seven-car FollowerStopper model in Step Test with bad reference velocity.}
 \label{stringvelbad}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{multiFS_velgood.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_velgood.PNG}}
 \caption{Velocity vs time of seven-car FollowerStopper model in Step Test with good reference velocity.}
 \label{stringvelgood}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{multiFS_errorbad.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_errorbad.PNG}}
 \caption{Spacing error vs time of seven-car FollowerStopper model in Step Test with bad reference velocity.}
 \label{stringerrorbad}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{multiFS_errorgood.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_errorgood.PNG}}
 \caption{Spacing error vs time of seven-car FollowerStopper model in Step Test with good reference velocity.}
 \label{stringerrorgood}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{multiFS_safety1.png}}
+\centerline{\includegraphics[width=6.50 in]{multiFS_safety1.PNG}}
 \caption{Velocity vs time of seven-car FollowerStopper in Safety Test 1 with bad reference velocity.}
 \label{stringsafety1}
 \end{figure}
