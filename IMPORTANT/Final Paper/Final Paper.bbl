@@ -1,0 +1,93 @@
+\begin{thebibliography}{10}
+
+\bibitem{sugiyama2008traffic}
+Y.~Sugiyama, M.~Fukui, M.~Kikuchi, K.~Hasebe, A.~Nakayama, K.~Nishinari, S.-i.
+  Tadaki, and S.~Yukawa, ``Traffic jams without bottlenecks--experimental
+  evidence for the physical mechanism of the formation of a jam,'' {\em New
+  journal of physics}, vol.~10, no.~3, p.~033001, 2008.
+
+\bibitem{stern2018dissipation}
+R.~E. Stern, S.~Cui, M.~L. Delle~Monache, R.~Bhadani, M.~Bunting, M.~Churchill,
+  N.~Hamilton, H.~Pohlmann, F.~Wu, B.~Piccoli, {\em et~al.}, ``Dissipation of
+  stop-and-go waves via control of autonomous vehicles: Field experiments,''
+  {\em Transportation Research Part C: Emerging Technologies}, vol.~89,
+  pp.~205--221, 2018.
+
+\bibitem{litman2017autonomous}
+T.~Litman, {\em Autonomous vehicle implementation predictions}.
+\newblock Victoria Transport Policy Institute Victoria, Canada, 2017.
+
+\bibitem{bhadani2019real}
+R.~Bhadani, M.~Bunting, B.~Seibold, R.~Stern, S.~Cui, J.~Sprinkle, B.~Piccoli,
+  and D.~B. Work, ``Real-time distance estimation and filtering of vehicle
+  headways for smoothing of traffic waves,'' in {\em Proceedings of the 10th
+  ACM/IEEE International Conference on Cyber-Physical Systems}, pp.~280--290,
+  ACM, 2019.
+
+\bibitem{bhadani2018dissipation}
+R.~K. Bhadani, B.~Piccoli, B.~Seibold, J.~Sprinkle, and D.~Work, ``Dissipation
+  of emergent traffic waves in stop-and-go traffic using a supervisory
+  controller,'' in {\em 2018 IEEE Conference on Decision and Control (CDC)},
+  pp.~3628--3633, IEEE, 2018.
+
+\bibitem{rajamani2011vehicle}
+R.~Rajamani, {\em Vehicle dynamics and control}.
+\newblock Springer Science \& Business Media, 2011.
+
+\bibitem{feng2019string}
+S.~Feng, Y.~Zhang, S.~E. Li, Z.~Cao, H.~X. Liu, and L.~Li, ``String stability
+  for vehicular platoon control: Definitions and analysis methods,'' {\em
+  Annual Reviews in Control}, 2019.
+
+\bibitem{bhadani2018cat}
+R.~K. Bhadani, J.~Sprinkle, and M.~Bunting, ``The cat vehicle testbed: A
+  simulator with hardware in the loop for autonomous vehicle applications,''
+  {\em arXiv preprint arXiv:1804.04347}, 2018.
+
+\bibitem{hoberock1977survey}
+L.~L. Hoberock, ``A survey of longitudinal acceleration comfort studies in
+  ground transportation vehicles,'' {\em Journal of Dynamic Systems,
+  Measurement, and Control}, vol.~99, no.~2, pp.~76--84, 1977.
+
+\bibitem{carsort}
+CarSort, ``2012 ford escape hybrid.''
+
+\bibitem{motortrend}
+MotorTrend, ``2012 ford escape reviews.''
+
+\bibitem{caranddriver}
+D.~Vanderwerp, ``Ford escape hybrid 4wd,'' December 2004.
+
+\bibitem{edmunds}
+Edmunds, ``Used 2012 ford escape hybrid hybrid review.''
+
+\bibitem{michigan}
+``Vehicle test book,'' 2007.
+
+\bibitem{fambro1997nchrp}
+D.~Fambro, K.~Fitzpatrick, and R.~Koppa, ``Nchrp report 400: Determination of
+  stopping sight distances,'' {\em TRB, National Research Council, Washington,
+  DC}, 1997.
+
+\bibitem{muller2003estimation}
+S.~Muller, M.~Uchanski, and K.~Hedrick, ``Estimation of the maximum tire-road
+  friction coefficient,'' {\em Journal of dynamic systems, measurement, and
+  control}, vol.~125, no.~4, pp.~607--617, 2003.
+
+\bibitem{vehicledynamicsblockset}
+MathWorks, 1 Apple Hill Drive, Natick, MA 01760-2098, {\em Vehicle Dynamics
+  Blockset: Reference}, version 1.2~ed., March 2019.
+
+\bibitem{wu2018arizona}
+F.~Wu, R.~E. Stern, S.~Cui, M.~L. Delle~Monache, R.~Bhadani, M.~Bunting,
+  M.~Churchill, N.~Hamilton, B.~Piccoli, B.~Seibold, {\em et~al.}, ``The
+  arizona ring experiments dataset (ared),'' 2018.
+
+\bibitem{wu2019tracking}
+F.~Wu, R.~E. Stern, S.~Cui, M.~L. Delle~Monache, R.~Bhadani, M.~Bunting,
+  M.~Churchill, N.~Hamilton, B.~Piccoli, B.~Seibold, {\em et~al.}, ``Tracking
+  vehicle trajectories and fuel rates in phantom traffic jams: Methodology and
+  data,'' {\em Transportation Research Part C: Emerging Technologies}, vol.~99,
+  pp.~82--109, 2019.
+
+\end{thebibliography}

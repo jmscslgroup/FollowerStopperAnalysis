@@ -46,7 +46,7 @@ sprinklejm@email.arizona.edu}
 \maketitle
 
 \begin{abstract}
-In this paper we demonstrate that the velocity controller, FollowerStopper, is safe and string stable. FollowerStopper is a controller that is meant to be implemented on an autonomous vehicle or in an adaptive cruise control (ACC) system. It takes as inputs the autonomous vehicle's velocity, relative distance to the car in front, relative velocity to the car in front, and a desired velocity.  It then commands a new velocity for the autonomous vehicle which will either be the desired velocity or some lower velocity if that is necessary to maintain a safe distance to the car in front. Through mathematical proof, simulation in Simulink, and hardware in the loop implementation on a real autonomous vehicle through Robot Operating System (ROS) and Gazebo, several results are achieved. It is found that, given a maximum LiDAR range of 81 m, there is a maximum permissible safe speed of the car based on its maximum deceleration, and the car is programmed so that it will never be less than 1 m from the vehicle in front. It is shown that a vehicle with FollowerStopper in a singular lane without merges will not crash and that it will be string stable, effectively dissipating human-caused traffic waves if enough vehicles are deployed in the traffic flow.
+In this paper we demonstrate that the velocity controller, FollowerStopper, is safe and string unstable. FollowerStopper is a controller that is meant to be implemented on an autonomous vehicle or in an adaptive cruise control (ACC) system. Through mathematical proof, simulation in Simulink, and hardware in the loop implementation on a real autonomous vehicle through Robot Operating System (ROS) and Gazebo, several results are achieved. It is found that an autonomous vehicle controlled by FollowerStopper will never crash. FollowerStopper will dissipate larger traffic waves from human-driven vehicles but will amplify smaller velocity perturbations that are created within the controller. Given the maximum LiDAR range of 81 m, FollowerStopper will never command a velocity greater than 13.69 m/s.
 \end{abstract}
 
 
@@ -113,19 +113,26 @@ Also known as the desired velocity or optimal velocity, the reference velocity i
 \begin{eqnarray}
 r={d_{total}\over t_{total}}
 \end{eqnarray}
+The reference velocity is typically sent to the AV by means of a roadside controller.
 \subsubsection{Spacing error, $\epsilon_i$}
 The spacing error is the difference between the desired relative distance and the actual relative distance, giving,
 \begin{eqnarray}
 \epsilon_i = \Delta x_{i des}-\Delta x_i.
 \end{eqnarray}
 
-\subsection{Definitions UNFINISHED}
+\subsection{Definitions}
 \subsubsection{Safe}
 A scenario is safe if at all times for every vehicle $i$ such that $1<i\leq n$, then $\Delta x_i>0$ m. This means that the relative distance will always be greater than 0 for every vehicle.
 \subsubsection{Individual vehicle stable}
 A velocity control law is considered to be individual vehicle stable if the spacing error of the AV approaches 0 with time if the lead vehicle travels at a constant velocity.
 \subsubsection{String stable}
-When a lead vehicle accelerates or decelerates in front of an individual vehicle stable AV, the spacing error will momentarily be nonzero. Suppose there is an infinite line of autonomous vehicles with one lead vehicle in front. The velocity control law is considered to be string stable if, during acceleration or deceleration of the lead vehicle, the spacing error decreases with each successive vehicle as they react to the change in velocity \cite{rajamani2011vehicle}. Additionally, all spacing errors must be in the same direction, either all negative or all positive. INCLUDE FURTHER DESCRIPTIONS OF STRING STABLE VS UNSTABLE GRAPHS
+When a lead vehicle accelerates or decelerates in front of an individual vehicle stable AV, the spacing error will momentarily be nonzero. Suppose there is an infinite line of autonomous vehicles with one lead vehicle in front. The velocity control law is considered to be string stable if, during acceleration or deceleration of the lead vehicle, the spacing error decreases with each successive vehicle as they react to the change in velocity \cite{rajamani2011vehicle}. Additionally, all spacing errors must be in the same direction, either all negative or all positive for a particular change in velocity. \cite{feng2019string} displays a theoretical plot of the spacing error of a string unstable and string stable group of vehicles, reproduced in Figure \ref{stringexample}.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=3 in]{stringexample}}
+\caption{String unstable and string stable spacing error vs time representation.}
+\label{stringexample}
+\end{figure}
 
 \subsection{Infrastructure}
 The FollowerStopper velocity controller is first modeled in Simulink and then used in conjunction with ROS to test in the physics-based simulation engine, Gazebo. After demonstrating success in Gazebo, the velocity controller is implemented onto the Cognitive and Autonomous Test (CAT) Vehicle at the University of Arizona using a hardware in the loop (HIL) configuration as described in \cite{bhadani2018cat}.
@@ -141,7 +148,7 @@ The FollowerStopper velocity controller is first modeled in Simulink and then us
 
 
 \section{Parameters}
-In the development of the FollowerStopper controller, several parameters are often used. They are grouped here to allow for easy reference. Some of the parameters involve acceleration due to gravity, which will be taken as $G=9.80665 {m\over s^2}$ for our purposes. In choosing the parameters, safety is the priority. If safety is not a concern, keeping a small distance between the AV and the lead is desirable in order to accommodate for a higher density of cars on the road and to prevent lane changes of human drivers in front of the AV. Table 1 at the end of the section summarizes the findings.
+In the development of the FollowerStopper controller, several parameters are often used. They are grouped here to allow for easy reference. Some of the parameters involve acceleration due to gravity, which will be taken as $G=9.80665 {m\over s^2}$ for our purposes. In choosing the parameters, safety is the priority. If safety is not a concern, keeping a small distance between the AV and the lead is desirable in order to accommodate for a higher density of cars on the road and to prevent lane changes of human drivers in front of the AV. Table \ref{tab1} at the end of the section summarizes the findings.
  
 \subsection{Minimum relative distance, $\psi$}
 Minimum relative distance refers to the minimum acceptable distance between the AV and the lead. While stopped, it is expected that $\Delta x= \psi$. We chose an arbitrary value of $\psi=1$ because we thought that if the AV was any closer to the lead, the passengers of the AV might be uncomfortable because they do not have control of the car. 
@@ -159,7 +166,7 @@ The maximum acceleration refers to the maximum possible acceleration of the AV. 
 The maximum deceleration refers to the maximum possible deceleration of the AV. Five different websites \cite{carsort,motortrend,caranddriver,edmunds,michigan} listed different maximum deceleration data for the Ford Escape Hybrid. The data was based off of an experiment where the vehicle would travel at a constant velocity before braking as hard as possible, and then reporting the stopping distance. For safety purposes, the deceleration with the lowest absolute value was chosen as the maximum deceleration for the Ford Escape Hybrid, that is $-7.66{m\over s^2}$ \cite{caranddriver}. If the maximum deceleration of the AV is not known, \cite{fambro1997nchrp} details $-3.99{m\over s^2}$ as the maximum deceleration of a passenger car traveling on wet pavement. This can be used if a more accurate estimation cannot be found.
 
 \subsection{Deceleration ratio, $k$}
-The deceleration ratio is the ratio between the maximum deceleration of the lead vehicle and the maximum deceleration of the AV. For FollowerStopper to be safe, as is shown in the next section, there must be some knowledge of how the lead and AV accelerations relate. A deceleration ratio less than unity, that is $k<1$, means that the AV can decelerate to a stop faster than the lead, meaning that it can travel closer than normal to the lead and still be safe. A deceleration ratio greater than unity, that is $k>1$, means that the lead can decelerate to a stop faster than the AV, meaning that the AV must follow at a greater relative distance in order to have a greater stopping distance. To be safe, we must assume that the lead vehicle can decelerate as fast as physically possible. From section A of the Appendix, the deceleration of a vehicle is $a=-G\mu$, where $\mu$ is the coefficient of friction. \cite{muller2003estimation} concludes that the maximum tire-road friction coefficient in normal driving on a dry road is $\mu_{max}=1$, so the maximum deceleration of the lead vehicle is $-G$.
+The deceleration ratio is the ratio between the maximum deceleration of the lead vehicle and the maximum deceleration of the AV. For FollowerStopper to be safe, as is shown in the next section, there must be some knowledge of how the lead and AV accelerations relate. A deceleration ratio less than unity, that is $k<1$, means that the AV can decelerate to a stop faster than the lead, meaning that it can travel closer than normal to the lead and still be safe. A deceleration ratio greater than unity, that is $k>1$, means that the lead can decelerate to a stop faster than the AV, meaning that the AV must follow at a greater relative distance in order to have a greater stopping distance. To be safe, assume that the lead vehicle can decelerate as fast as physically possible. From section A of the Appendix, the deceleration of a vehicle is $a=-G\mu$, where $\mu$ is the coefficient of friction. \cite{muller2003estimation} concludes that the maximum tire-road friction coefficient in normal driving on a dry road is $\mu_{max}=1$, so the maximum deceleration of the lead vehicle is $-G$.
 
 \begin{table}[htbp]
 \caption{FollowerStopper Parameters}
@@ -175,12 +182,6 @@ comfortable acceleration	&	$a_{cmft}$	&	$0.15\cdot G$			&	1.47$m\over s^2$	\\
 					&				&						&					\\
 comfortable deceleration	&	$a_{dcmft}$	&	$-0.266\cdot G$		&	-2.61$m\over s^2$	\\
 					&				&						&					\\
-maximum acceleration	&	$a_{max}$	&	$0.34\cdot G$			&	3.34$m\over s^2$	\\
-(general)				&				&						&					\\
-maximum deceleration	&	$a_{dmax}$	&	---					&	-3.99$m\over s^2$	\\
-(general)				&				&						&					\\
-deceleration ratio		&	$k$			&	$-G\over a_{dmax}$		&	2.46				\\
-(general)				&				&						&					\\
 maximum acceleration	&	$a_{max}$	&	---					&	3.53$m\over s^2$	\\
 (Ford Escape Hybrid)	&				&						&					\\
 maximum deceleration	&	$a_{dmax}$	&	---					&	-7.66$m\over s^2$	\\
@@ -205,14 +206,11 @@ deceleration ratio		&	$k$			&	$-G\over a_{dmax}$		&	1.28				\\
 \section{FollowerStopper Description}
 
 \subsection{Classification}
-The premise of FollowerStopper is to command exactly the reference velocity $r$ whenever safe because this is the velocity that could dissipate already formed traffic jams and could prevent new traffic jams from forming. If $r>v_{lead}$ and the AV is getting close to the lead, FollowerStopper will command a lower velocity $v_{cmd}$ whenever safety requires, based on the AV's velocity, relative velocity to the lead vehicle, and relative distance to the lead vehicle. Assuming that the two cars start out far enough apart, there are three relative velocity regions.
-\begin{enumerate}
-\item $v_{lead} > r$: $v_{cmd}=r$ because the AV will not catch up to the lead
-\item $v_{lead} = r$: $v_{cmd}=r$ because the AV will not catch up to the lead
-\item $v_{lead}<r$: $v_{cmd}\leq r$ because if the AV is far enough away, it can continue to travel at $r$. Once the AV gets within a specified distance $\Delta x \leq \xi_3$ then it must travel less than $r$ in order to prevent a collision. This distance should take into account that hard braking is a contributing factor to traffic jams, so the AV should begin slowing down well in advance of a crash in order to be able to decelerate at a comfortable level of deceleration $a_{dcmft}$.
-\end{enumerate}
+The premise of FollowerStopper is to command exactly the reference velocity $r$ whenever safe because this is the velocity that could dissipate already formed traffic jams and could prevent new traffic jams from forming. Assuming that the lead starts a safe distance ahead of the AV, when $r\leq v_{lead}$, FollowerStopper will command the reference velocity, that is $v_{cmd}=r$. FollowerStopper takes the AV's velocity, relative velocity to the lead vehicle, and relative distance to the lead vehicle as inputs to determine three relative distances $\xi_1$, $\xi_2$, and $\xi_3$, in order of increasing magnitude.
 
-The Follower Stopper controller from \cite{bhadani2019real} is reproduced below. 
+Suppose now that $r>v_{lead}$, so the relative distance $\Delta x$ will be decreasing. Once the AV gets within the relative distance $\Delta x \leq \xi_3$,  FollowerStopper will slow down the vehicle by commanding a velocity less than $r$. If the AV must continue to travel at a value lower than the relative velocity $r$, FollowerStopper, by slowly decreasing the command velocity, will cause the AV to travel at the lead velocity $v_{lead}$, following at a relative distance of $\Delta x=\xi_2$. If the lead vehicle decelerates unexpectedly or the relative distance decreases further to $\Delta x=\xi_1$, FollowerStopper will command the AV to stop.
+
+The mathematical representation of the FollowerStopper controller from \cite{bhadani2019real} is reproduced below. 
 \begin{eqnarray}
 v_{cmd} &=& \begin{dcases}
         0 								& \Delta x\leq \xi_1 \\
@@ -224,37 +222,37 @@ v_{cmd} &=& \begin{dcases}
 \begin{eqnarray}
 \xi_j(\Delta v)	&=& \omega_j + {1\over 2\alpha_j}(\Delta v^*)^2 \ \ {\rm for \ \ j=1, 2, 3}
 \end{eqnarray}
-where $v = min(max(v_{lead}, 0), r)$. $r$ is the reference velocity as taken from the output of smoothUpParams and $v_{cmd}$ is the command velocity that is sent to the AV. The $\omega_j$ and $\alpha_j$ values in the equation for $\xi_j$ are distance and deceleration parameters, respectively, and $\Delta v^*=min(\Delta v, 0)$. \cite{bhadani2019real} suggests for future work to optimize the distance and deceleration parameters, which were previously set to $\omega_1=4.5$ m, $\omega_2=5.25$ m, $\omega_3=6.0$ m, $\alpha_1=1.5 {\rm {m\over s^2}}$, $\alpha_2=1.0 {\rm {m\over s^2}}$, and $\alpha_3=0.5 {\rm {m\over s^2}}$. The following sections will seek to accomplish this task of finding the ideal $\xi_j$ values.
+where $v = min(max(v_{lead}, 0), r)$. $r$ is the reference velocity as taken from the output of smoothUpParams and $v_{cmd}$ is the command velocity that is sent to the AV. The $\omega_j$ and $\alpha_j$ values in the equation for $\xi_j$ are distance and deceleration parameters, respectively, and $\Delta v^*=min(\Delta v, 0)$. \cite{bhadani2019real} suggests for future work to optimize the distance and deceleration parameters, which were previously set to $\omega_1=4.5$ m, $\omega_2=5.25$ m, $\omega_3=6.0$ m, $\alpha_1=1.5 {\rm {m\over s^2}}$, $\alpha_2=1.0 {\rm {m\over s^2}}$, and $\alpha_3=0.5 {\rm {m\over s^2}}$. The following sections seek to accomplish this task of finding the ideal $\xi_j$ values.
 
 \subsection{SmoothUpParams}
-Theoretically, the reference velocity will be given to the AV by means of a roadside controller which takes traffic data and determines the optimal constant velocity. The function SmoothUpParams edits the reference velocity once the AV receives it but before it is used by FollowerStopper in order to prevent harsh and unnecessary acceleration or deceleration. SmoothUpParams is a function of the new reference velocity $r$, the autonomous vehicle velocity $v_{AV}$, the maximum comfortable acceleration for the autonomous vehicle $a_{cmft}$, and the maximum comfortable deceleration for the autonomous vehicle $a_{dcmft}$. Using these inputs, SmoothUpParams edits the reference velocity so that it is a reasonable value when it is sent to the FollowerStopper controller. Suppose, for example, the speed limit were to change from 10 m/s to 15 m/s and no car was in front of the AV. FollowerStopper would command the AV to travel at the reference velocity of 15 m/s immediately, but this will result in an uneccesarily large acceleration. SmoothUpParams will cause the reference velocity to increase at a slow rate so that FollowerStopper can comfortably transition to the new reference velocity.
+Theoretically, the reference velocity will be given to the AV by means of a roadside controller which takes traffic data and determines the optimal constant velocity. SmoothUpParams is a function of the new reference velocity $r$, the autonomous vehicle velocity $v_{AV}$, the maximum comfortable acceleration of the autonomous vehicle $a_{cmft}$, and the maximum comfortable deceleration of the autonomous vehicle $a_{dcmft}$. Using these inputs, SmoothUpParams edits the reference velocity so that it is a reasonable value when it is sent to the FollowerStopper controller. Suppose, for example, the speed limit and consequently the reference velocity were to change from 10 m/s to 15 m/s and no car was in front of the AV. Without SmoothUpParams, FollowerStopper would command the AV to travel at the reference velocity of 15 m/s immediately, but this will result in an unnecessarily large acceleration. SmoothUpParams will cause the reference velocity to increase at a slow rate so that FollowerStopper can comfortably transition to the new reference velocity without accelerating faster than $a_{cmft}$ or decelerating faster than $a_{dcmft}$.
 
 \subsection{Designing $\xi_1$ for safety}
-According to FollowerStopper, if $\Delta x \leq \xi_1$, then $v_{cmd}=0$. That is, if the relative distance between the AV and the lead is less than or equal to $\xi_1$, the AV should brake as hard as possible or remain stopped if already at a stop. The AV will recognize that it should emergency brake at $\Delta x=\xi_1$, but the actual braking will not initiate until $\delta$ seconds after $\Delta x=\xi_1$ due to the system delay. To prove that FollowerStopper is safe, we simply need to show that if $\Delta x = \xi_1$, braking as hard as possible after a delay of $\delta$ seconds will never result in a crash. This assumes that no unexpected obstacle comes between the AV and the lead. The metric is computed as:
+According to FollowerStopper, if $\Delta x \leq \xi_1$, then $v_{cmd}=0$. That is, if the relative distance between the AV and the lead is less than or equal to $\xi_1$, the AV should brake as hard as possible or remain stopped if already at a stop. If FollowerStopper commands $v_{cmd}=0$, the AV will not initiate the emergency braking command until $\delta$ seconds after the FollowerStopper command due to system delay. To prove that FollowerStopper is safe, it must be shown that if $\Delta x = \xi_1$, braking as hard as possible after a delay of $\delta$ seconds will never result in a crash. This assumes that no unexpected obstacle comes between the AV and the lead. The metric is computed as:
 \begin{dmath}
 \xi_1 = \psi +\Delta v^{**}+v_{AV}(1-{a_{max}\over a_{dmax}})\delta+{a_{max}\over 2}(1-{a_{max}\over a_{dmax}})\delta^2
 \end{dmath}
-where $\Delta v^{**} = max(0,{1\over 2ka_{dmax}}(v_{lead}^2-kv_{AV}^2))$. The derivation can be found in the Appendix.
+where $\Delta v^{**} = max(0,{1\over 2ka_{dmax}}(v_{lead}^2-kv_{AV}^2))$. The derivation can be found in section B the Appendix.
 
 \subsection{Designing $\xi_2$ for string stability}
-When $v_{AV}>v_{lead}$, the relative distance $\Delta x$ will decrease as the AV approaches the lead. When $\Delta x$ drops below a certain threshold in such a situation, FollowerStopper is designed to incrementally command a smaller velocity $v_{cmd}<v_{AV}$ until the velocity of the AV is equal to the velocity of the lead $v_{cmd}=v_{lead}$. Once $v_{AV}=v_{lead}$, the AV will maintain the string stable distance $\Delta x=\xi_2$. If the relative distance drops below this equilibrium distance, that is $\Delta x<\xi_2$, the velocity of the AV will decrease below $v_{lead}$ in an attempt to recover this distance. The second line of the piecewise FollowerStopper controller in equation 5 demonstrates this concept.
+When $v_{AV}>v_{lead}$, the relative distance $\Delta x$ will decrease as the AV approaches the lead. When $\Delta x$ drops below $\xi_3$, FollowerStopper is designed to incrementally command a smaller velocity until the command velocity is equal to the velocity of the lead $v_{cmd}=v_{lead}$. Once $v_{AV}=v_{lead}$, the AV will maintain the distance $\Delta x=\xi_2$. If the relative distance drops below this equilibrium distance, that is $\Delta x<\xi_2$, the velocity of the AV will decrease below $v_{lead}$ in an attempt to recover this distance.
 
- If the distance is greater than the equilibrium distance, that is $\Delta x>\xi_2$, the velocity of the AV will increase in an attempt to recover this distance unless $v_{lead}$ exceeds the reference velocity, at which point $v_{cmd}=r$. Therefore, the AV will spend the majority of its functioning at or above the distance $\xi_2$. It is important, then, that $\xi_2$ is a string stable distance. According to \cite{rajamani2011vehicle}, string stability is maintained when the time-gap $h$ between two cars is such that $h\geq2\tau$, where $\tau$ is the time constant of any lags in tracking the command velocity, or in other words, it is the delay of the system $\delta$. Additionally to maintaining a time-gap greater than $2\delta$, it is necessary that $\xi_2>\xi_1$. With this knowledge the metric is computed as: 
+ If the distance is greater than the equilibrium distance, that is $\Delta x>\xi_2$, the velocity of the AV will increase in an attempt to recover this distance unless $v_{lead}$ exceeds the reference velocity, at which point $v_{cmd}=r$. Therefore, the AV will spend the majority of its functioning at or above the distance $\xi_2$. It is important, then, that $\xi_2$ is a string stable distance. According to \cite{rajamani2011vehicle}, string stability is maintained when the time-gap $h$ between two cars is such that $h\geq2\tau$, where $\tau$ is the time constant of any lags in tracking the command velocity, or in other words, it is the delay of the system $\delta$. It is reasonable to treat the relative distance $\xi_1$ as the point from which to maintain a time-gap greater than $2\delta$ because at $\Delta x=\xi_1$, the AV must stop. With this knowledge the metric is computed as: 
  \begin{dmath}
  \xi_2 = \xi_1 + 2v_{AV}\delta
  \end{dmath}
 
 \subsection{Designing $\xi_3$ for comfort}
-If $\Delta x>\xi_3$, then $v_{cmd}=r$. Once $\Delta x\leq \xi_3$, the AV will begin a comfortable deceleration before reaching the distance $\xi_2$ that it wants to maintain while $v_{lead}<r$. In order to preserve an equal spacing between all of the relative distance parameters $\xi_3$, $\xi_2$, and $\xi_1$, we design FollowerStopper such that $\xi_2$ is the average of $\xi_1$ and $\xi_3$. A brief amount of algebra reveals the calculation for $\xi_3$. The metric is computed as:
+If $\Delta x>\xi_3$, then $v_{cmd}=r$. When $\Delta x\leq \xi_3$, the AV will begin a comfortable deceleration from $r$ to $v_{lead}$, maintaining the distance $\xi_2$ while it travels at $v_{lead}$. In order to preserve an equal spacing between all of the relative distance parameters $\xi_3$, $\xi_2$, and $\xi_1$, FollowerStopper is designed such that $\xi_2$ is the average of $\xi_1$ and $\xi_3$. A brief amount of algebra reveals the calculation for $\xi_3$. The metric is computed as:
 \begin{eqnarray}
 \xi_3 = 2\xi_2-\xi_1
 \end{eqnarray}
 
-\subsection{Maximum safe speed}
-Due to the limited sight of the LiDAR, the AV can only detect relative distance data up to 81 m ahead. If a vehicle were stopped at greater than 81 m ahead, the AV would not know unless some other sensor with a larger range such as radar were incorporated. In our testing we only incorporated LiDAR, however, so we used 81 m as the maximum distance of a vehicle ahead. Setting $\xi_1=81$ m and $v_{lead}=0$, solving for $v_{AV}$ gives the maximum safe speed of the AV, that is $v_{AVsafe}=23.65$ m/s.
+\subsection{Maximum FollowerStopper speed}
+Due to the limited sight of the LiDAR, the AV can only detect relative distance data up to 81 m ahead. Therefore, if there is no obstacle within 81 m, FollowerStopper will assume that there is a vehicle at $\Delta x=81$ m traveling at the same speed as the AV. In such a case, the AV will continue to accelerate until $\xi_2=81$ m because at this point, the AV will no longer accelerate or decelerate unless the lead changes its velocity, which will never happen. $\xi_2=81$ m when $v_{AV}=13.69$ m/s, so the current implementation of FollowerStopper makes it impossible for the AV to travel faster than that speed. The maximum speed would increase if either there was a new formula for $\xi_2$ that would make it smaller, or if the range of the sensors were to increase, for example with the use of radar instead of LiDAR. In our testing we only incorporated LiDAR, however, so we used 81 m as the maximum distance of a vehicle ahead.
 
 \subsection{Further considerations}
-FollowerStopper is designed such that the AV will not accelerate faster than $a_{max}$ and will not decelerate faster than $a_{dmax}$. This is necessary because even if FollowerStopper commands an acceleration outside of this range, it is physically impossible for the AV to execute the command. Additionally, in order to reduce oscillatory noise in the velocity command data, the FollowerStopper controller, after determining a new $v_{cmd}$, will take a moving average of the new value and a set number of previous $v_{cmd}$ values. The current controller uses a moving average of 5 steps, meaning that the command velocity will be the average of the newly calculated $v_{cmd}$ and the four previous command velocities.
+FollowerStopper is designed such that the AV will not accelerate faster than $a_{max}$ and will not decelerate faster than $a_{dmax}$. This is necessary because even if FollowerStopper commands an acceleration outside of this range, it is physically impossible for the AV to execute the command. If FollowerStopper were to command an unrealistic velocity, it could cause irreparable wear on the tires or and excessive load to the engine. Additionally, in order to reduce oscillatory noise in the command velocity data, the FollowerStopper controller, after determining a new command velocity, will take a moving average of the new value and a set number of previous $v_{cmd}$ values. The current controller uses a moving average of 75 steps, meaning that the command velocity will be the average of the newly calculated $v_{cmd}$ and the 74 previous command velocities. The reason for this choice is detailed in the section 6.
 
 
 
@@ -265,7 +263,7 @@ FollowerStopper is designed such that the AV will not accelerate faster than $a_
 
 
 \section{Simulink Model}
-To compare the old and new versions of FollowerStopper, a Simulink model was developed incorporating the Vehicle Body 3DOF model. The model incorporated expected sensor and actuation delays and could display output such as the lead and AV velocities, positions, and accelerations. It was not completely accurate, as when sending a delayed $v_{AV}$ to the Vehicle Body 3DOF block, the simulation would produce inaccurate data, so instead the $v_{AV}$ data could not be delayed. The final representation of the model is displayed below for a lead vehicle and AV. The model is computed using a fixed time-step of 0.01 s, meaning that it is updated every 0.01 s.
+To compare the old and new versions of FollowerStopper, a Simulink model was developed incorporating the Vehicle Body 3DOF model. The model incorporates expected sensor and actuation delays and can display output such as the lead and AV velocities, positions, and accelerations. It is not completely accurate, as when sending a delayed $v_{AV}$ to the Vehicle Body 3DOF block, the simulation produces inaccurate data. Therefore, the $v_{AV}$ data could not be delayed. The final representation of the model is displayed below for a lead vehicle and AV. The model is computed using a fixed time-step of 0.01 s, meaning that it is updated every 0.01 s.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=3.5 in]{simulink_model.png}}
@@ -274,7 +272,7 @@ To compare the old and new versions of FollowerStopper, a Simulink model was dev
 \end{figure}
 
 \subsection{Vehicle Body 3DOF}
-The Vehicle Body 3DOF Dual Track block in Simulink was used to model the lead vehicle and the AV. This particular block was chosen because it is ideal for creating virtual sensor data, which can then be used by FollowerStopper. Further information about the model can be found in \cite{vehicledynamicsblockset}. By inputing a velocity "xdot", steering angle, and initial longitudinal position "X\_o" to the lead vehicle, the block would artificially create vehicle data including the instantaneous position and instantaneous velocity of the lead. Another Vehicle Body 3DOF Dual Track block was used to model the AV, using the same steering angle, but starting at a lower longitudinal position "X\_o" in order to start behind the lead. The input velocity for the AV came from the command velocity output of FollowerStopper.
+The Vehicle Body 3DOF Dual Track block in Simulink models the lead vehicle and the AV. This particular block is ideal for creating virtual sensor data, which can then be used by FollowerStopper. Further information about the model can be found in \cite{vehicledynamicsblockset}. By inputing a velocity "xdot", steering angle, and initial longitudinal position "X\_o" to the lead vehicle, the block artificially creates vehicle data including the instantaneous position and instantaneous velocity of the lead. Another Vehicle Body 3DOF Dual Track block models the AV, using the same steering angle, but starting behind the lead at a lesser longitudinal position "X\_o". The input velocity for the AV comes from the command velocity $v_{cmd}$ output of FollowerStopper.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=3.5 in]{vehicle_body_3dof.png}}
@@ -286,15 +284,19 @@ Several velocity data files were created for the lead to follow to test the safe
 
 
 \subsection{Delay}
-The delay $\delta$ of the system is of supreme importance because at high speeds, if the AV needs to stop, it can still travel a considerable distance before receiving the stopping command and implementing the command. Contributions to the delay include the LiDAR sensor delay (0.133 s), the moving average filter delay ($\rm {5\ moving\ steps\over 2}(0.01{s\over step})$), and a fixed delay (1.0 s) due to friction, actuator dynamics, controller update rate, etc. From \cite{bhadani2019real}, considering that the position sampling frequency $F_s$ and velocity sampling frequency $F_v$ are both 75 Hz,
+The delay $\delta$ of the system is of supreme importance because at high speeds, the AV can travel a considerable distance before receiving and implementing a new velocity command. Contributions to the delay include the LiDAR sensor delay (0.133 s), the moving average filter delay ($\rm {75\ moving\ steps\over 2}(0.01{s\over step})$), and a fixed delay (1.0 s) due to friction, actuator dynamics, controller update rate, etc. From \cite{bhadani2019real}, considering that the position sampling frequency $F_s$ and velocity sampling frequency $F_v$ are both 75 Hz,
 
 \begin{eqnarray*}
 \delta &=& {\delta_f F_s \over F_v}+\delta_r = \delta_f +\delta_r \\
-&=& 0.133+{5\over 2}(0.01)+1\\
-&=& 1.158 \rm\ s
+&=& 0.133+{75\over 2}(0.01)+1\\
+&=& 1.508 \rm\ s
 \end{eqnarray*}
 
-where $\delta_f$ is the delay of the filtered LiDAR data and $\delta_r$ is a fixed delay. It is desirable to replicate the actual CAT Vehicle in the Simulink model as nearly as possible. As mentioned above, the LiDAR takes relative distance data, which needs to be filtered to become relative velocity data, adding the 0.133 s sensor delay. Assuming that the AV velocity is known at all times, the AV velocity, relative distance, and relative velocity go as inputs into FollowerStopper. The command velocity $v_{cmd}$ is modified with a moving average filter, adding the 0.025 s filter delay. Once there is a $v_{cmd}$ value, it is sent to the actuators, adding the 1.0 s delay. It is obvious that it would be inaccurate to use the current values of the relative distance, relative velocity, and AV velocity in the Simulink model. FollowerStopper uses the AV velocity and relative velocity to calculate the lead velocity, so while an AV velocity that is less delayed by 0.133 s is known, the AV velocity at the time the LiDAR data is received should be used. It is currently unclear as to which value of the AV velocity is used. Given this knowledge, the Simulink model could be considered reasonably accurate if the relative distance, relative velocity, and AV velocity were delayed by 1.158 s. Unfortunately, the Vehicle Body 3DOF Dual Track block does not produce reasonable data when the AV velocity is delayed. FollowerStopper, rather than using the AV velocity from 1.158 s before, instead updates $v_{cmd}$ every 1.158 s, slowing the simulation from its normal update rate of 0.01 s. The problem is related to the Vehicle Body block rather than FollowerStopper, and a solution could not be found that would not compromise more important parts of the model. The model therefore uses the delayed relative distance and relative velocity values, but it uses the current AV velocity, deeming the model inaccurate but still an acceptable platform from which to test FollowerStopper before implementation into Gazebo or the actual CAT Vehicle.
+where $\delta_f$ is the filter delay and $\delta_r$ is the fixed delay. It is desirable to replicate the actual CAT Vehicle in the Simulink model as nearly as possible. As mentioned above, the LiDAR takes relative distance data, which needs to be filtered to become relative velocity data, adding the 0.133 s sensor delay. Assuming that the AV velocity is known at all times, the AV velocity, relative distance, and relative velocity go as inputs into FollowerStopper. The command velocity $v_{cmd}$ is modified with a moving average filter, adding the 0.375 s filter delay. Once there is a $v_{cmd}$ value, it is sent to the actuators, adding the 1.0 s delay. 
+
+It is obvious that it would be inaccurate to use the current values of the relative distance, relative velocity, and AV velocity in the Simulink model. Though the AV knows its velocity at the time the LiDAR data is processed, it should use the velocity from 0.133 s beforehand, when it received the LiDAR data. It is currently unclear as to which value of the AV velocity FollowerStopper uses in the CAT Vehicle. 
+
+Given this knowledge, the Simulink model could be considered reasonably accurate if the relative distance, relative velocity, and AV velocity were all delayed by 1.508 s. Unfortunately, when the AV velocity is delayed, the simulation updates $v_{cmd}$ once every 1.508 s, slowing the simulation from its normal update rate of 0.01 s. The problem is related to the Vehicle Body block rather than FollowerStopper, and a solution could not be found that would not compromise more important parts of the model. The model therefore uses the delayed relative distance and relative velocity values, but it uses the current AV velocity, deeming the model inaccurate but still an acceptable platform from which to test FollowerStopper before implementation into Gazebo or the actual CAT Vehicle.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=3.5 in]{delay.png}}
@@ -312,7 +314,7 @@ The SmoothUpParams block, as described above, edits the reference velocity befor
 \end{figure}
 
 \subsection{FollowerStopper}
-The FollowerStopper block takes .... as inputs and uses a MATLAB Function to calculate $\xi_1$, $\xi_2$, $\xi_3$, and $v_{cmd}$ as described in the FollowerStopper Description section above. It additionally includes a moving average filter and ensures that no velocity is commanded that will require a greater acceleration or deceleration than is physically possible with the Ford Escape Hybrid. The FollowerStopper block outputs the new $v_{cmd}$, and then that value is used as the input velocity to the AV for the next time step.
+The FollowerStopper block takes $\Delta x$, $\Delta v$, $r$, $a_{max}$, $a_{dmax}$, $k$, the moving average, and $\delta$ as inputs and uses a MATLAB Function to calculate $\xi_1$, $\xi_2$, $\xi_3$, and $v_{cmd}$ as described in section 4 above. The FollowerStopper block outputs the new $v_{cmd}$, and then that value is used as the input velocity to the AV for the next time step.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=3.5 in]{followerstopper.png}}
@@ -321,7 +323,7 @@ The FollowerStopper block takes .... as inputs and uses a MATLAB Function to cal
 \end{figure}
 
 \subsection{Multi-car model}
-The descriptions thus far have focused on the development of a two-car model, with one lead vehicle and one AV. This is sufficient for building the model, implementing in Gazebo, and testing with the CAT Vehicle. Additionally it is sufficient for determining if FollowerStopper is safe because any velocity can be input to the lead, and the AV will follow. When determining string stability, however, a multi-car model is required in order to see how each successive car reacts to a change in velocity by the lead vehicle. To test for string stability, the AV Vehicle Body 3DOF block, delay blocks, SmoothUpParams, and FollowerStopper were combined into one block to represent one AV, as pictured in Figure \ref{multicarmodel1}. The one combined block could take the lead velocity and lead position as inputs and would output the AV velocity and AV position. By connecting several blocks in a line and editing the initial longitudinal position of each vehicle, a multi-car model could be developed and analyzed, as seen in Figure \ref{multicarmodel2}.
+The descriptions thus far have focused on the development of a two-car model, with one lead vehicle and one AV. This is sufficient for building the model, implementing in Gazebo, and testing with the CAT Vehicle. Additionally it is sufficient for determining if FollowerStopper is safe because any velocity can be input to the lead, and the AV will follow. When determining string stability, however, a multi-car model is required in order to see how each successive car reacts to a change in velocity by the lead vehicle. To test for string stability, the AV Vehicle Body 3DOF block, delay blocks, SmoothUpParams, and FollowerStopper were combined into one block to represent one AV, as pictured in Figure \ref{multicarmodel1}. The one combined block could take the lead position, moving average, reference velocity, and lead velocity as inputs and would output the AV position, spacing error, and velocity. By connecting several blocks in a line and editing the initial longitudinal position of each vehicle, a multi-car model could be developed and analyzed, as seen in Figure \ref{multicarmodel2}.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=2 in]{7carmodelblock.png}}
@@ -346,24 +348,41 @@ The descriptions thus far have focused on the development of a two-car model, wi
 \section{Safety and String Stability Verification}
 
 \subsection{Safety and string stability tests}
-The following tests were run with both the previous and current version of FollowerStopper. Three tests were developed to test the safety of the original FollowerStopper and the new version of FollowerStopper, based on the optimized $\xi_j$ values. When designing the tests, the maximum safe speed of the AV from previous calculations was considered so that the tests would not operate above this velocity. The safety of a controller is determined by its minimum relative distance. In a worst-case scenario, FollowerStopper would have an incredible high reference velocity, so all safety tests were recorded using a relative velocity of $r=100$ m/s. Step Test was performed with a good and a bad reference velocity, as the reference velocity has an effect on the level of string stability. The safety tests used the two-car Simulink model while the string stability tests required a seven-car Simulink model.
+Three tests were developed to test the safety of the original FollowerStopper and the new version of FollowerStopper, based on the optimized $\xi_j$ values. When designing the tests, the maximum speed of the AV from previous calculations was considered so that the tests would not operate above this velocity. The safety of a controller is determined by its minimum relative distance. In a worst-case scenario, FollowerStopper would have an incredible high reference velocity, so all safety tests were recorded using a relative velocity of $r=100$ m/s. Step Test was performed with a good and a bad reference velocity, as the reference velocity has an effect on the level of string stability. The safety tests used the two-car Simulink model with the original and new version of FollowerStopper while the string stability tests required a seven-car Simulink model and used only the new version of FollowerStopper.
 \subsubsection{Safety Test 1}
-The front of the lead vehicle starts 10 m in front of the AV. At the start of the simulation it accelerates from 0 to 15 m/s at an acceleration of $a_{max}$. It continues traveling at 15 m/s for 45 seconds. It then decelerates to 0 at a deceleration of $G$.
+The front of the lead vehicle starts 10 m in front of the AV. At the start of the simulation it accelerates from 0 to 12 m/s at an acceleration of $a_{max}$. It continues traveling at 12 m/s for 40 seconds. It then decelerates to 0 at a deceleration of $G$.
 \subsubsection{Safety Test 2}
-The front of the lead vehicle starts 10 m in front of the AV. At the start of the simulation it accelerates from 0 to 10 m/s at an acceleration of $a_{max}$. It continues traveling at 10 m/s for 25 seconds. It then accelerates at an acceleration of $a_{max}$ for $\delta=1.158$ seconds. It then immediately decelerates to 0 at a deceleration of $G$.
+The front of the lead vehicle starts 10 m in front of the AV. At the start of the simulation it accelerates from 0 to 10 m/s at an acceleration of $a_{max}$. It continues traveling at 10 m/s for 25 seconds. It then accelerates at an acceleration of $a_{max}$ for $\delta=1.508$ seconds. It then immediately decelerates to 0 at a deceleration of $G$.
 \subsubsection{Safety Test 3}
 The front of the lead vehicle starts 1000 m in front of the AV. The lead vehicle remains stationary through the entire test.
 \subsubsection{Step Test}
-The front of the lead vehicle starts 10 m in front of the AV. At the start of the simulation it accelerates to 10 m/s at a near infinite acceleration (1000 $m\over s^2$). The lead continues traveling at 10 m/s for 350 seconds. It then decelerates to 3 m/s at near infinite deceleration (-700 $m\over s^2$). It continues traveling at 3 m/s for 150 seconds. It then accelerates to 20 m/s and continues traveling at 20 m/s for 600 seconds.
+The front of the lead vehicle starts 10 m in front of the AV. At the start of the simulation it accelerates to 10 m/s at an acceleration of $G$. The lead continues traveling at 10 m/s for 175 seconds. It then decelerates to 2 m/s at a deceleration of $G$. It continues traveling at 2 m/s for 150 seconds. It then accelerates to 10 m/s and continues traveling at 10 m/s for the remainder of the test.
+
+\subsection{Determination of the moving average}
+Before performing the safety and string stability tests, an ideal moving average value needed to be chosen for the new FollowerStopper. To decide, Step Test was implemented using the seven-car model. The moving average was modified in each run, using no moving average, a moving average of 5, 25, 50, 75, and 100. The plots of each are detailed in Figures \ref{ma1}--\ref{ma100}, respectively, in section C of the Appendix.
+
+In order to have individual vehicle stability, the actual relative distance must approach the desired relative distance as time approaches infinity if the lead travels at a constant velocity. Because FollowerStopper is operating at a velocity lower than the reference velocity, the desired relative distance is $\xi_2$. The plots of FollowerStopper with no moving average, a moving average of 5, 25, and 50 reveal that the velocities never reach a steady value, meaning that the relative distance would not be constant, so FollowerStopper in such cases would not be individual vehicle stable.
+
+The plots of the moving average of 75 and 100 both reveal individual vehicle stability, but the moving average of 100 results in slight oscillations in the last vehicle at around 400 seconds, so a moving average of 75 was chosen.
 
 \subsection{Safety verification of the original FollowerStopper}
-The original $\xi_j$ values for FollowerStopper were not optimized but were merely chosen to achieve some desired behavior \cite{bhadani2019real}. Though the original FollowerStopper is safe in some instances, it is not always safe, making it a non-viable option for commercial use. In Safety Test 1, the relative distance drops to -13.7 m. In Safety Test 2, the relative distance drops to -5.6 m. In Safety Test 3, the relative distance drops to -162.3 m. In all three tests, the relative distance is negative, meaning that implementation of the original FollowerStopper results in a crash and is unsafe. The plots of the three tests are detailed in the Appendix.
+The original $\xi_j$ values for FollowerStopper were not optimized but were merely chosen to achieve some desired behavior \cite{bhadani2019real}. Though the original FollowerStopper is safe in some instances, it is not always safe, making it a non-viable option for commercial use. In Safety Test 1, the relative distance drops to -0.7 m. In Safety Test 2, the relative distance drops to -5.7 m. In Safety Test 3, the relative distance drops to -162.3 m. In all three tests, the relative distance is negative, meaning that implementation of the original FollowerStopper results in a crash and is unsafe. The plots of the three tests are detailed Figures \ref{oldsafe1}--\ref{oldsafe3} in section D of the Appendix.
 
 \subsection{Safety verification of the new FollowerStopper}
-Due to the derivations for $\xi_j$ as mentioned in the previous section, the new FollowerStopper is designed for safety. In Safety Test 1, the relative distance drops to 4.4 m. In Safety Test 2, the relative distance drops to 4.4 m. In Safety Test 3, the relative distance drops to 4.4 m. In all three tests, the minimum relative distance $\Delta x>0$, so the new implementation of FollowerStopper will not result in a crash and is safe. The plots of the three tests are detailed in the Appendix.
+Due to the derivations for $\xi_j$ as detailed in section 4, the new FollowerStopper is designed for safety. In Safety Test 1, the relative distance drops to 6.6 m. In Safety Test 2, the relative distance drops to 5.6 m. In Safety Test 3, the relative distance drops to 5.0 m. In all three tests, the minimum relative distance $\Delta x>0$, so the new implementation of FollowerStopper will not result in a crash and is safe. The plots of the three tests are detailed in Figures \ref{newsafe1}--\ref{newsafe3} in section D of the Appendix.
 
-\subsection{String stability verification UNFINISHED}
-Based on the description of string stability in the definitions section, we can test for string stability based on velocity and spacing error. During acceleration or deceleration, the acceleration of each successive FollowerStopper vehicle should be less extreme in order to be string stable. This means that if there is a deceleration from 10 m/s to 5 m/s, each vehicle should decelerate at a lower deceleration value. Another way to test for string stability is based on spacing error, or the difference between the actual relative distance and desired relative distance. Because FollowerStopper is designed to follow at a distance of $\xi_2$, we can treat $\xi_2$ as the desired distance. During acceleration or deceleration, the maximum spacing error should decrease as each vehicle reacts to the change in velocity. The Step Test was performed using a bad reference velocity of $r=100$ m/s and a reasonable reference velocity of $r=20$ m/s. 
+\subsection{String stability verification}
+Based on the description of string stability in the definitions section, we can test for string stability based on the AV velocity and spacing error. To test using velocities, during acceleration or deceleration or the lead, the acceleration of each successive FollowerStopper vehicle should be less extreme in order to be string stable, and the velocities should not overshoot. Additionally, velocity perturbations should dissipate with each successive car. This means that if there is a deceleration from 10 m/s to 5 m/s, each vehicle should decelerate at values decreasing in magnitude, and no vehicle should travel slower than 5 m/s at any point. 
+
+Another way to test for string stability is based on spacing error, or the difference between the actual relative distance and desired relative distance. Because FollowerStopper is designed to follow at a distance of $\xi_2$ when the reference velocity is greater than the lead velocity, we can treat $\xi_2$ as the desired relative distance. During acceleration or deceleration, the maximum spacing error should decrease as each vehicle reacts to the change in velocity. The Step Test was performed using a bad reference velocity of $r=100$ m/s and a good reference velocity. In a real traffic-wave, a lead vehicle would slow down from its original velocity, and after exiting the wave, it would speed up back to its original velocity. The good reference velocity is designed to dissipate the traffic-wave of the Step Test. Therefore, the reference velocity is 6.1 m/s for 327 s, at which point the first AV behind the lead will catch up to the lead. At exactly this instant, the lead begins to accelerate up to 10 m/s, so the reference velocity increases to 10 m/s. In such a case, the autonomous vehicles travel at a constant velocity and never have to decelerate.
+
+Figure \ref{stringvelbad} displays the velocities of the lead and six FollowerStopper followers with a bad reference velocity. Each successive car accelerates and decelerates with a smaller magnitude, and no car overshoots 10 m/s or 2 m/s, suggesting string stability. Figure \ref{stringvelgood} displays the velocities of the lead and six FollowerStopper followers with a good reference velocity. Though there is no overshoot, small perturbations in the first couple of FollowerStopper vehicles amplifies so that the last FollowerStopper has considerable oscillations in its velocity, suggesting string instability. 
+
+Figure \ref{stringerrorbad} displays the spacing errors of the lead and six FollowerStopper followers with a bad reference velocity. Particularly in the middle region, each successive vehicle. has a decreasing spacing error. Though there are some wayward data points at the beginning of the data corresponding to the second acceleration in the Step Test, the data shows a similar trend of a decreasing spacing error with each successive vehicle, suggesting string stability. The regions on the left and right of the plot are concerning because a string stable controller should have either all positive or all negative spacing errors for a specific acceleration or deceleration. This is not the case in the left and right regions, suggesting string instability.
+
+Figure \ref{stringerrorgood} displays the spacing errors of the lead and six FollowerStopper followers with the good reference velocity. The left region is similar to the left region in the bad reference velocity graph, but it is smoother. The middle region, as expected, displays no deviation from the desired relative distance, as expected. The right region, however, exemplifies the magnification of small velocity perturbations that was apparent in Figure \ref{stringvelgood} at around 350 s, suggesting string instability.
+
+Though FollowerStopper demonstrates some qualities of string stability, the current version cannot be considered string stable because of its magnification of small perturbations of velocity. Though it seems to dissipate larger velocity changes such as from the lead, it fails to dissipate smaller changes, demonstrated particularly well by the oscillations that grow at around 50 seconds in Figure \ref{stringsafety1}, which implements Safety Test 1 on the seven-car model. If the small perturbations were to be dissipated, a more convincing case could be made for the string stability of FollowerStopper. This could be achieved through the design of a more successful command velocity filter than the current moving average filter, but this could be developed in future work.
 
 
 
@@ -376,10 +395,10 @@ Based on the description of string stability in the definitions section, we can 
 \section{Results}
 
 \subsection{Gazebo implementation}
-Using Robot Operating Systems (ROS), the Simulink model could be downloaded as C/C++ code to be implemented in the physics-based simulator Gazebo. Gazebo operates using a hardware in the loop (HIL) principle with the CAT Vehicle, allowing for accurate estimation of implementation of FollowerStopper onto the real vehicle. When converting the Simulink model to C/C++ code, the vehicle dynamic blocks and all artificial delays were removed because the CAT Vehicle will introduce its own delays.
+Using Robot Operating Systems (ROS), the Simulink model could be downloaded as C/C++ code to be implemented in the physics-based simulator Gazebo. Gazebo operates using a hardware in the loop (HIL) principle with the CAT Vehicle, allowing for accurate estimation of implementation of FollowerStopper onto the real vehicle. When converting the Simulink model to C/C++ code, the vehicle dynamics blocks and all artificial delays were removed because the CAT Vehicle will introduce its own delays.
 
 \subsection{CAT Vehicle testing}
-Using the CAT Vehicle, we tested the new FollowerStopper controller in a parking lot owned by the University of Arizona with minimal pedestrian or vehicle traffic. A 2006 Buick Lacrosse traveled at a slow velocity, acceleration, and deceleration, and the CAT Vehicle successfully and safely reacted to the input. Subsequently, a human moved in front of the vehicle at a walking pace while making several stops along the way, and the vehicle safely followed without any driver input to the gas or brake pedals. No conclusions about string stability could be made during the physical tests because such conclusions can only be drawn if several autonomous vehicles with FollowerStopper followed one another. There is only one CAT Vehicle, limiting string stability testing.
+Using the CAT Vehicle, we tested the new FollowerStopper controller in a parking lot owned by the University of Arizona with minimal pedestrian or vehicle traffic. A human-driven vehicle traveled at a slow velocity, acceleration, and deceleration, and the CAT Vehicle successfully and safely reacted to the input. Subsequently, a human moved in front of the vehicle at a walking pace while making several stops along the way, and the vehicle safely followed without any driver input to the gas or brake pedals. No conclusions about string stability could be made during the physical tests because such conclusions can only be tested with several autonomous vehicles with FollowerStopper. Unfortunately, there is only one CAT Vehicle, limiting string stability testing.
 
 
 
@@ -389,10 +408,21 @@ Using the CAT Vehicle, we tested the new FollowerStopper controller in a parking
 
 
 
-\section{Conclusion UNFINISHED}
+\section{Conclusion}
+In this paper we present an optimized version of the velocity controller FollowerStopper using theoretical proof, Simulink simulation, and implementation onto the CAT Vehicle autonomous vehicle. The development of the optimization and development of the Simulink model, which served as the primary platform for testing, were discussed rigorously. The original version of FollowerStopper proved useful in avoiding crashes and dissipating traffic waves in previous experiments setup through the University of Arizona. We provide a formal analysis of the safety and string stability of the velocity controller.
 
-\subsection{Further work}
-Little work was done to optimize the reference velocity $r$. An idea could be to use smart phone traffic congestion data to calculate the length of a traffic wave and average speed of the vehicles in the wave as a reference velocity for the autonomous vehicle. The reference velocity is incredibly important to the development of FollowerStopper. By simply controlling the reference velocity, one could make FollowerStopper string stable and safe, irregardless of the $\xi_j$ values that were optimized in this paper. Additionally, FollowerStopper was proven to be safe given dry, sunny conditions when the car is traveling in a line at no incline. Future research could be done to edit the acceleration parameters based on the incline of the road, the weather conditions, and the wear of the tire. \cite{muller2003estimation} shows that different weather conditions can dramatically change the coefficient of tire-road friction. Furthermore, the current Simulink model has several limitations. The most concerning limitation is its difficulty in handling the AV velocity delay. Future work could attempt to use a different vehicle dynamics model or an entire new platform that could better incorporate delay. Finally, use of LiDAR as the main sensor input is limiting due to the short range of LiDAR. Future work could test the accuracy and usability of relying on radar or some other longer-range sensor so that the vehicle can safely travel faster than the current maximum safe speed of $v_{AVsafe}=23.65$ m/s.
+The physics-based proof demonstrates that FollowerStopper should never crash theoretically, and a variety of tests with the Simulink model asserts this claim. Some tests in Simulink demonstrate string stability, while others provide contradictions. FollowerStopper possesses qualities of string stability through its dissipation of the synthetically-created vehicle velocity data, but it amplifies small velocity perturbations that it creates on its own, resulting in a conclusive determination that the optimized version is not string stable.
+
+\subsection{Future work}
+Of upmost concern is modifying FollowerStopper to maintain its safety but also to be string stable. Development of a more extensive command velocity filter than just a moving average could dissipate the small perturbations, resulting in a string stable controller.
+
+Little work was done to optimize the reference velocity $r$. An idea could be to use smart phone traffic congestion data to calculate the length of a traffic wave and average speed of the vehicles in the wave as a reference velocity for the autonomous vehicle.
+
+FollowerStopper was proven to be safe given dry, sunny conditions when the car is traveling straight with no incline. Future research could be done to edit the acceleration parameters based on the incline of the road, the weather conditions, and the wear of the tire. \cite{muller2003estimation} shows that different weather conditions dramatically affect the coefficient of tire-road friction.
+
+The current Simulink model has several limitations. The most concerning limitation is its difficulty in handling the AV velocity delay. Future work could attempt to use a different vehicle dynamics model or an entire new platform that could better incorporate delay. 
+
+Use of LiDAR as the main sensor input is limiting due to the short range of LiDAR. Future work could test the accuracy and usability of relying on radar or some other longer-range sensor so that the vehicle can safely travel faster than the current maximum speed of $v_{AVsafe}=13.69$ m/s. A redevelopment of $\xi_2$ to a lesser value could also increase the maximum speed.
 
 
 
@@ -434,13 +464,12 @@ mG=N_f+N_b=N.
 \end{eqnarray*}
 The force of friction is proportional to the normal force by means of the coefficient of friction, $\mu$. Assuming that the force of friction on the front and back tires is equal,
 \begin{eqnarray*}
-f_f+f_b=N_f\mu+N_b\mu=(N_f+N_b)\mu=N\mu
+f_f+f_b=N_f\mu+N_b\mu=(N_f+N_b)\mu=N\mu=mG\mu
 \end{eqnarray*}
 According to Newton's second law, the sum of the forces is proportional to the mass and the acceleration of an object. If we only consider the car's longitudinal direction, or the direction in which it is traveling at velocity, $v$,
 \begin{eqnarray*}
 \sum F &=& ma \\
 -f_f-f_b &=& ma \\
--N\mu &=& ma \\
 -mG\mu &=& ma \\
 a &=& -G\mu
 \end{eqnarray*}
@@ -507,47 +536,141 @@ Finally, it must be noted that it is never desirable for $\xi_1$ to drop below $
 \end{eqnarray*}
 
 
+\pagebreak
+\subsection{Moving average plots}
+\begin{figure}[htbp!]
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma1.png}}
+\caption{Step Test with no moving average.}
+\label{ma1}
+\end{figure}
 
-\section{Safety and String Stability Plots}
+\begin{figure}[htbp!]
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma5.png}}
+\caption{Step Test with a moving average of 5.}
+\label{ma5}
+\end{figure}
+
+\begin{figure}[htbp!]
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma25.png}}
+\caption{Step Test with a moving average of 25.}
+\label{ma25}
+\end{figure}
+
+\begin{figure}[htbp!]
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma50.png}}
+\caption{Step Test with a moving average of 50.}
+\label{ma50}
+\end{figure}
+
+\begin{figure}[htbp!]
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma75.png}}
+\caption{Step Test with a moving average of 75.}
+\label{ma75}
+\end{figure}
+
+\begin{figure}[htbp!]
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad_ma100.png}}
+\caption{Step Test with a moving average of 100.}
+\label{ma100}
+\end{figure}
+
+\begin{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{verbatim}
+\pagebreak
 \subsection{FollowerStopper safety plots}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{oldFS_safety1.png}}
+\centerline{\includegraphics[width=5.71 in]{oldFS_safety1.png}}
 \caption{Original FollowerStopper in Safety Test 1.}
-\label{fig3}
+\label{oldsafe1}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{oldFS_safety2.png}}
+\centerline{\includegraphics[width=5.71 in]{oldFS_safety2.png}}
 \caption{Original FollowerStopper in Safety Test 2.}
-\label{fig3}
+\label{oldsafe2}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{oldFS_safety3.png}}
+\centerline{\includegraphics[width=5.71 in]{oldFS_safety3.png}}
 \caption{Original FollowerStopper in Safety Test 3.}
-\label{fig3}
+\label{oldsafe3}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{newFS_safety1.png}}
+\centerline{\includegraphics[width=5.71 in]{newFS_safety1.png}}
 \caption{New FollowerStopper in Safety Test 1.}
-\label{fig3}
+\label{newsafe1}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{newFS_safety2.png}}
+\centerline{\includegraphics[width=5.71 in]{newFS_safety2.png}}
 \caption{New FollowerStopper in Safety Test 2.}
-\label{fig3}
+\label{newsafe2}
 \end{figure}
 
 \begin{figure}[htbp]
-\centerline{\includegraphics[width=6.50 in]{newFS_safety3.png}}
+\centerline{\includegraphics[width=5.71 in]{newFS_safety3.png}}
 \caption{New FollowerStopper in Safety Test 3.}
-\label{fig3}
+\label{newsafe3}
 \end{figure}
 
+
+\pagebreak
+\subsection{FollowerStopper string stability plots}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=6.50 in]{multiFS_velbad.png}}
+\caption{Velocity vs time of seven-car FollowerStopper model in Step Test with bad reference velocity.}
+\label{stringvelbad}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=6.50 in]{multiFS_velgood.png}}
+\caption{Velocity vs time of seven-car FollowerStopper model in Step Test with good reference velocity.}
+\label{stringvelgood}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=6.50 in]{multiFS_errorbad.png}}
+\caption{Spacing error vs time of seven-car FollowerStopper model in Step Test with bad reference velocity.}
+\label{stringerrorbad}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=6.50 in]{multiFS_errorgood.png}}
+\caption{Spacing error vs time of seven-car FollowerStopper model in Step Test with good reference velocity.}
+\label{stringerrorgood}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=6.50 in]{multiFS_safety1.png}}
+\caption{Velocity vs time of seven-car FollowerStopper in Safety Test 1 with bad reference velocity.}
+\label{stringsafety1}
+\end{figure}
 
 \end{appendix}
-
 \end{document}
