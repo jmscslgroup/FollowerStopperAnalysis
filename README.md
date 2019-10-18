@@ -14,6 +14,8 @@ __Contributors:__
 This project is funnded by the National Science Foundation under Awards 1659428 for Chris John Kreienkamp and Daniel Fishbein
 and under Awards 1659428, 1521617, and 1446435 for Rahul Bhadani and Matthew Bunting.
 
+![NSF](https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/NSF_logo.png/220px-NSF_logo.png) ![CSL](http://csl.arizona.edu/sites/default/files/csllogo_0_0.png)
+
 # Copyright Notice
 
 Copyright (c) 2015-2020 Arizona Board of Regents
